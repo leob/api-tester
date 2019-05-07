@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Ping",
+    "description": "Ping operation"
+  }, {
+    "name": "signup_login_success",
+    "description": "Register & Login successful"
+  }, {
+    "name": "signup_login_fail",
+    "description": "Register & Login failed"
+  }
+]
