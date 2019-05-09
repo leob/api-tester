@@ -8,16 +8,10 @@ export interface Session {
     speakerIds: number[],
     tracks: string[]
   }
-  
+
   export interface SessionState {
     searchText: string;
     trackFilters: string[];
     sessions: Session[];
     favoriteSessions: number[];
   }
-  
-  export interface SessionGroup {
-    startTime: string,
-    sessions: Session[]
-  }
-  

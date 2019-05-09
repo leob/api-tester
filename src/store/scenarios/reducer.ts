@@ -7,7 +7,7 @@ const defaultState: ScenarioState = {
   scenarios: []
 };
 
-export type ScenarioAction = ActionType<typeof scenarios>
+export type ScenarioAction = ActionType<typeof scenarios>;
 
 export default (state = defaultState, action: ScenarioAction): ScenarioState => {
   switch (action.type) {

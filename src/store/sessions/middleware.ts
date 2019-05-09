@@ -1,25 +1,23 @@
 import * as sessions from './actions';
-import { Session, SessionState } from './types';
+import { Session } from './types';
+import { RootState } from '../index';
+
 import { ActionType, getType } from 'typesafe-actions';
-import { Middleware } from 'redux';
+import { getMiddleware } from '../util';
 
-const fetchSessionsMiddleware: Middleware<{}, SessionState> =
-    ({ getState }) => next => async (action: ActionType<typeof sessions>) => {
+const fetchSessions = async (action: ActionType<typeof sessions>,
+                             getState: () => RootState): Promise<Session[]> => {
 
-  next(action);
+  const response = await fetch('/data/sessions.json');
+  const sessionList: Session[] = await response.json();
 
-  if (action.type !== getType(sessions.updateSessions)) {
-    return;
-  }
-
-  next(sessions.fetchSessions.request());
-  try {
-    const response = await fetch('/data/sessions.json');
-    const sessionList: Session[] = await response.json();
-    next(sessions.fetchSessions.success(sessionList));
-  } catch (e) {
-    next(sessions.fetchSessions.failure(e));
-  }
+  return sessionList;
 };
+
+const fetchSessionsMiddleware = getMiddleware(
+  getType(sessions.updateSessions),
+  sessions.fetchSessions.request, sessions.fetchSessions.success, sessions.fetchSessions.failure,
+  fetchSessions
+);
 
 export const middlewares = [ fetchSessionsMiddleware ];

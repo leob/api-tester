@@ -9,7 +9,9 @@ const defaultState: SessionState = {
   favoriteSessions: []
 }
 
-export default (state = defaultState, action: ActionType<typeof sessions>): SessionState => {
+export type SessionAction = ActionType<typeof sessions>;
+
+export default (state = defaultState, action: SessionAction): SessionState => {
   switch (action.type) {
   case getType(sessions.setSearchText):
     return {
@@ -24,9 +26,10 @@ export default (state = defaultState, action: ActionType<typeof sessions>): Sess
           updatedList.push(item);
         }
         return updatedList;
-      }, <string[]>[]);
+      }, [] as string[]);
     return {
       ...state,
+      trackFilters: updatedTrackFilters
     };
   case getType(sessions.removeTrackFilter):
     return {
@@ -46,7 +49,7 @@ export default (state = defaultState, action: ActionType<typeof sessions>): Sess
           updatedList.push(item);
         }
         return updatedList;
-      }, <number[]>[])
+      }, [] as number[]);
     return {
       ...state,
       favoriteSessions: updatedFavoriteSessions

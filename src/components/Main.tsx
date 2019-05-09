@@ -22,6 +22,16 @@ import { RootState, selectors, actions } from '../store';
 //   history: History;
 // }
 
+const mapStateToProps = (state: RootState) => ({
+  scenarios: state.scenarios.scenarios,
+  selectedScenario: selectors.scenarios.selected
+});
+
+const mapDispatchToProps = {
+  updateScenarios: (/*dummyTestValue*/) => actions.scenarios.updateScenarios(/*dummyTestValue*/)  //,
+  // setSelectedScenario: (scenario: Scenario) => actions.scenarios.setSelectedScenario(scenario),
+}
+
 // type Props = RouteComponentProps<{}> & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
 type Props = {} & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
 
@@ -37,7 +47,7 @@ class Main extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    props.updateScenarios();
+    props.updateScenarios(/*"a dummy test value, not used"*/);
 
     // this.ionRefresherRef = React.createRef<HTMLIonRefresherElement>();
     // this.ionFabRef = React.createRef<HTMLIonFabElement>();
@@ -76,16 +86,6 @@ class Main extends Component<Props, State> {
       </IonContent>
     );
   }
-}
-
-const mapStateToProps = (state: RootState) => ({
-  scenarios: state.scenarios.scenarios,
-  selectedScenario: selectors.scenarios.selected
-});
-
-const mapDispatchToProps = {
-  updateScenarios: () => actions.scenarios.updateScenarios()//,
-  // setSelectedScenario: (scenario: Scenario) => actions.scenarios.setSelectedScenario(scenario),
 }
 
 export default connect(

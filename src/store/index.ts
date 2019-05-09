@@ -10,7 +10,7 @@ import scenarios from './scenarios/reducer';
 // Sessions module
 import * as sessionActions from './sessions/actions';
 import * as sessionSelectors from './sessions/selectors';
-import { middlewares as sessionMiddlewares } from './scenarios/middleware';
+import { middlewares as sessionMiddlewares } from './sessions/middleware';
 import sessions from './sessions/reducer';
 
 // Actions
