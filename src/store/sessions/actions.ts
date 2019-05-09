@@ -1,40 +1,44 @@
 import { createAction, createAsyncAction } from 'typesafe-actions';
 import { Session } from './types';
 
+function name(name: string): string {
+  return 'sessions/' + name;
+}
+
 export const fetchSessions = createAsyncAction(
-  'sessions/FETCH_REQUEST',
-  'sessions/FETCH_SUCCESS',
-  'sessions/FETCH_FAILURE'
+  name('FETCH_REQUEST'),
+  name('FETCH_SUCCESS'),
+  name('FETCH_FAILURE')
 )<void, Session[], Error>();
 
-export const updateSessions = createAction('sessions/UPDATE_SESSIONS', resolve =>
-  () => resolve()
+export const updateSessions = createAction(name('UPDATE_SESSIONS'), action =>
+  () => action()
 );
 
-export const setSearchText = createAction('sessions/SET_SEARCH_TEXT', resolve =>
-  (searchText: string) => resolve(searchText)
+export const setSearchText = createAction(name('SET_SEARCH_TEXT'), action =>
+  (searchText: string) => action(searchText)
 );
 
-export const addTrackFilter = createAction('sessions/ADD_TRACK_FILTER', resolve =>
-  (trackName: string) => resolve(trackName)
+export const addTrackFilter = createAction(name('ADD_TRACK_FILTER'), action =>
+  (trackName: string) => action(trackName)
 );
 
-export const removeTrackFilter = createAction('sessions/REMOVE_TRACK_FILTER', resolve =>
-  (trackName: string) => resolve(trackName)
+export const removeTrackFilter = createAction(name('REMOVE_TRACK_FILTER'), action =>
+  (trackName: string) => action(trackName)
 );
 
-export const updateTrackFilters = createAction('sessions/UPDATE_TRACK_FILTERS', resolve =>
-  (trackNames: string[]) => resolve(trackNames)
+export const updateTrackFilters = createAction(name('UPDATE_TRACK_FILTERS'), action =>
+  (trackNames: string[]) => action(trackNames)
 );
 
-export const addFavorite = createAction('sessions/ADD_FAVORITE', resolve =>
-  (sessionId: number) => resolve(sessionId)
+export const addFavorite = createAction(name('ADD_FAVORITE'), action =>
+  (sessionId: number) => action(sessionId)
 );
 
-export const removeFavorite = createAction('sessions/REMOVE_FAVORITE', resolve =>
-  (sessionId: number) => resolve(sessionId)
+export const removeFavorite = createAction(name('REMOVE_FAVORITE'), action =>
+  (sessionId: number) => action(sessionId)
 );
 
-export const updateFavoriteFilter = createAction('sessions/UPDATE_FAVORITE_FILTER', resolve =>
-  (sessionIds: number[]) => resolve(sessionIds)
+export const updateFavoriteFilter = createAction(name('UPDATE_FAVORITE_FILTER'), action =>
+  (sessionIds: number[]) => action(sessionIds)
 );

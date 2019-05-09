@@ -1,39 +1,34 @@
 import { StateType } from 'typesafe-actions';
 import { combineReducers, createStore, applyMiddleware, compose, Middleware } from 'redux';
 
-// Actions
-import * as scenariosActions from './scenarios/actions';
-import * as sessionsActions from './sessions/actions';
-
-// Selectors
-import * as scenariosSelectors from './scenarios/selectors';
-import * as sessionsSelectors from './sessions/selectors';
-
-// Middlewares
-import { fetchScenariosMiddleware } from './scenarios/middleware';
-// import { fetchSessionsMiddleware } from './sessions/middleware';
-
-// Reducers
+// Scenarios module
+import * as scenarioActions from './scenarios/actions';
+import * as scenarioSelectors from './scenarios/selectors';
+import { middlewares as scenarioMiddlewares } from './scenarios/middleware';
 import scenarios from './scenarios/reducer';
+
+// Sessions module
+import * as sessionActions from './sessions/actions';
+import * as sessionSelectors from './sessions/selectors';
+import { middlewares as sessionMiddlewares } from './scenarios/middleware';
 import sessions from './sessions/reducer';
 
 // Actions
 export const actions = {
-  sessions: sessionsActions,
-  scenarios: scenariosActions
+  scenarios: scenarioActions,
+  sessions: sessionActions
 }
 
 // Selectors
 export const selectors = {
-  sessions: sessionsSelectors,
-  scenarios: scenariosSelectors
+  scenarios: scenarioSelectors,
+  sessions: sessionSelectors
 };
 
 // Middlewares
-const middlewares: Middleware[] = [
-  fetchScenariosMiddleware
-//   fetchSessionsMiddleware,
-];
+const middlewares: Middleware[] = []
+  .concat(scenarioMiddlewares)
+  .concat(sessionMiddlewares);
 
 // Reducers
 export const rootReducer = combineReducers({
@@ -42,9 +37,6 @@ export const rootReducer = combineReducers({
 });
 
 // Store
-
-// root state
-export type RootState = StateType<typeof rootReducer>;
 
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -58,6 +50,8 @@ function configureStore(initialState?: {}) {
 
 // store; pass an optional param to rehydrate state on app start
 const store = configureStore();
-export default store
+export default store;
 
+// root state
+export type RootState = StateType<typeof rootReducer>;
 

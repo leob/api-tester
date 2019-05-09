@@ -3,7 +3,7 @@ import { Scenario, ScenarioState } from './types';
 import { ActionType, getType } from 'typesafe-actions';
 import { Middleware } from 'redux';
 
-export const fetchScenariosMiddleware: Middleware<{}, ScenarioState> =
+const fetchScenariosMiddleware: Middleware<{}, ScenarioState> =
     ({ getState }) => next => async (action: ActionType<typeof scenarios>) => {
 
   next(action);
@@ -21,3 +21,5 @@ export const fetchScenariosMiddleware: Middleware<{}, ScenarioState> =
     next(scenarios.fetchScenarios.failure(e));
   }
 };
+
+export const middlewares = [ fetchScenariosMiddleware ];
