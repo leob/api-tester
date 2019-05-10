@@ -8,32 +8,32 @@ import { middlewares as scenarioMiddlewares } from './scenarios/middleware';
 import scenarios from './scenarios/reducer';
 
 // Sessions module
-import * as sessionActions from './sessions/actions';
-import * as sessionSelectors from './sessions/selectors';
-import { middlewares as sessionMiddlewares } from './sessions/middleware';
-import sessions from './sessions/reducer';
+// import * as sessionActions from './sessions/actions';
+// import * as sessionSelectors from './sessions/selectors';
+// import { middlewares as sessionMiddlewares } from './sessions/middleware';
+// import sessions from './sessions/reducer';
 
 // Actions
 export const actions = {
-  scenarios: scenarioActions,
-  sessions: sessionActions
+  scenarios: scenarioActions
+  // sessions: sessionActions
 }
 
 // Selectors
 export const selectors = {
-  scenarios: scenarioSelectors,
-  sessions: sessionSelectors
+  scenarios: scenarioSelectors
+  // sessions: sessionSelectors
 };
 
 // Middlewares
 const middlewares: Middleware[] = []
-  .concat(scenarioMiddlewares)
-  .concat(sessionMiddlewares);
+  .concat(scenarioMiddlewares);
+  // .concat(sessionMiddlewares);
 
 // Reducers
 export const rootReducer = combineReducers({
-  scenarios,
-  sessions
+  scenarios
+  // sessions
 });
 
 // Store

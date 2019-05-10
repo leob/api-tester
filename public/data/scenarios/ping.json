@@ -1,0 +1,10 @@
+{
+  "name": "Ping",
+  "description": "Ping session",
+  "steps": [
+    {
+      "name": "ping",
+      "operation": "ping"
+    }
+  ]
+}

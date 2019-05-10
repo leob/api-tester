@@ -16,6 +16,11 @@ export default (state = defaultState, action: ScenarioAction): ScenarioState => 
         ...state,
         scenarios: action.payload
       }
+    case getType(scenarios.setSelectedScenario):
+      return {
+        ...state,
+        selectedScenario: action.payload
+      }
     default:
       return state;
   }

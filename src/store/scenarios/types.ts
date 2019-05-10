@@ -1,6 +1,13 @@
+export interface ScenarioStep {
+    name: string;
+    description?: string;
+    operation: string;
+  }
+
 export interface Scenario {
   name: string;
-  description: number;
+  description: string;
+  steps: ScenarioStep[];
 }
 
 export interface ScenarioState {
