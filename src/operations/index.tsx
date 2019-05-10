@@ -11,7 +11,7 @@ export type Result = {
 } | {
   isError: false,
   data: any,
-  status: number
+  status?: number
 };
 
 async function request(
@@ -47,9 +47,6 @@ async function request(
 const operations: any = {};
 
 operations.ping = async (): Promise<Result> => {
-  //   return axios.get(
-  //   `${config.API_URL}/ping`
-  // )
   return await request({url: `${URL}/ping`, method: 'GET', omitDefaultHeaders: true});
 };
 

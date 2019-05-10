@@ -12,6 +12,7 @@ import {
   IonList,
   IonListHeader,
   IonLabel,
+  IonNote,
   IonItem,
   IonToast
 } from '@ionic/react';
@@ -133,14 +134,14 @@ class Main extends Component<Props, State> {
   async executeScenario(scenario: Scenario) {
     let step: ScenarioStep;
 
-    for (step of scenario.steps) {
+    for (step of scenario.definition.steps) {
       const name = step.name;
       const operation = operations[name];
 
       if (operation) {
         const result: Result = await operation();
 
-        console.log(result);
+console.log(result);
       }
     }
   }
@@ -179,7 +180,12 @@ class Main extends Component<Props, State> {
                   onClick={(e: MouseEvent) => this.selectScenario(e, scenario)}
                   // onClick={this.goToLink}
                 >
-                  <h3>{scenario.name}</h3>
+                  <IonLabel>
+                    <h3>{scenario.name}</h3>
+                  </IonLabel>
+                  <IonNote slot="end">
+                    <h3>{scenario.description}</h3>
+                  </IonNote>
                 </IonItem>
               ))}
             </IonList>
@@ -199,11 +205,11 @@ class Main extends Component<Props, State> {
                     <IonLabel>Steps</IonLabel>
                   </IonListHeader>
 
-                  {selectedScenario.steps.map(step => (
+                  {selectedScenario.definition.steps.map(step => (
                     <IonItem
                       key={step.name}
                     >
-                      <h3>{step.name}</h3>
+                      {step.name}
                     </IonItem>
                   ))}
                 </IonList>
