@@ -32,6 +32,6 @@ export const updateScenarios = createAction('scenarios/UPDATE_SCENARIOS', action
   (/*dummyTestValue: string*/) => action(/*dummyTestValue*/)
 );
 
-export const setSelectedScenario = createAction('scenarios/SET_SELECTED_SCENARIO', action =>
-  (scenario: Scenario) => action(scenario)
-);
+// export const setSelectedScenario = createAction('scenarios/SET_SELECTED_SCENARIO', action =>
+//   (scenario: Scenario) => action(scenario)
+// );

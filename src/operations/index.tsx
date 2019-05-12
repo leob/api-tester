@@ -14,8 +14,17 @@ export type Result = {
   status?: number
 };
 
+type RequestParams = {
+  url: string;
+  method: string;
+  headers?: {} | null;
+  omitDefaultHeaders?: boolean;
+  params?: {} | null;
+  data?: {} | null;
+};
+
 async function request(
-  {url, method, headers = null, omitDefaultHeaders = false, params = null, data = null}): Promise<Result> {
+  {url, method, headers = null, omitDefaultHeaders = false, params = null, data = null}: RequestParams): Promise<Result> {
 
   const defaultHeaders = {
     'Accept': 'application/json',

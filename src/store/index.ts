@@ -26,7 +26,7 @@ export const selectors = {
 };
 
 // Middlewares
-const middlewares: Middleware[] = []
+const middlewares: Middleware[] = ([] as Middleware[])
   .concat(scenarioMiddlewares);
   // .concat(sessionMiddlewares);
 

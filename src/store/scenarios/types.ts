@@ -15,6 +15,7 @@ export interface Scenario {
 }
 
 export interface ScenarioState {
-  selectedScenario?: Scenario;
+  // selectedScenario: Scenario | null;
   scenarios: Scenario[];
+  scenarioError: string | null;
 }

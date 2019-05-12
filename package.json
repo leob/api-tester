@@ -2,7 +2,7 @@
   "name": "api-tester",
   "version": "0.1.0",
   "private": true,
-  "devDependencies": {
+  "dependencies": {
     "@types/node": "^11.13.7",
     "@types/react": "^16.8.14",
     "@types/react-dom": "^16.8.4",
@@ -10,16 +10,14 @@
     "@types/react-router": "^4.4.5",
     "@types/react-router-dom": "^4.3.2",
     "react-scripts": "3.0.0",
-    "typescript": "^3.4.5"
-  },
-  "dependencies": {
+    "typescript": "^3.4.5",
     "@ionic/react": "^0.0.5",
     "axios": "^0.18",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-redux": "^5.1.1",
-    "react-router": "^5.0.0",
-    "react-router-dom": "^5.0.0",
+    "react-router": "^4.3.1",
+    "react-router-dom": "^4.3.1",
     "redux": "^4.0.1",
     "typesafe-actions": "^4.2.0"
   },
