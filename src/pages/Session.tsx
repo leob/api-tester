@@ -12,41 +12,72 @@ import {
   IonList,
   IonListHeader,
   IonLabel,
-  IonItem
+  IonItem,
+  IonText
 } from '@ionic/react';
 
+import { connect } from 'react-redux';
+import { RootState, actions } from '../store';
+
+import { Session } from '../store/sessions/types';
 import { Scenario, ScenarioStep } from '../store/scenarios/types';
 
 import operations from '../operations';
 import { Result } from '../operations';
 
-type Props = RouteComponentProps<{ name: string }>;
+const mapStateToProps = (state: RootState) => ({
+  sessions: state.sessions.sessions
+});
+
+const mapDispatchToProps = {
+  removeSession: (session) => actions.sessions.removeSession(session)
+};
+
+// sessionId is set via a URL parameter, passed as a property via React Router
+type BaseProps = { sessionId: string };
+type Props = RouteComponentProps<BaseProps> & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
 
 type State = {
-  scenarioName: string;
+  session: Session | null;
   scenario: Scenario | null;
   scenarioError: string | null;
 }
 
-class ScenarioDetail extends Component<Props, State> {
+class SessionPage extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
 
     this.state = {
-      scenarioName: props.match.params.name,
+      session: null,
       scenario: null,
       scenarioError: null
     }
   }
 
   componentDidMount() {
+    this.loadData();
+  }
 
-    this.loadScenario(this.state.scenarioName).then((result) => {
+  componentDidUpdate(prevProps) {
+
+    // If the page is called with a different SessionID parameter, then we must (re)load the session data
+    if (this.props.match.params.sessionId !== prevProps.match.params.sessionId) {
+      this.loadData();
+    }
+  }
+
+  loadData() {
+    const sessionId = this.props.match.params.sessionId;
+    const session = this.props.sessions.find(session => session.id === sessionId);
+
+    this.setState(() => ({ session }));
+
+    this.loadScenario(session.scenario.name).then((result) => {
       if (result.scenario) {
-        this.setState(() => ({ scenario: result.scenario }));
+        this.setState(() => ({ scenario: result.scenario, scenarioError: null }));
       } else {
-        this.setState(() => ({ scenarioError: result.message }));
+        this.setState(() => ({ scenarioError: result.message, scenario: null }));
       }
     });
   }
@@ -67,9 +98,12 @@ class ScenarioDetail extends Component<Props, State> {
     return { scenario, message };
   }
 
-  cancel = (e: MouseEvent) => {
+  close = (e: MouseEvent) => {
     e.preventDefault();
-    this.props.history.goBack();
+
+    // We 'close' the session, so we remove it and we go back to the home page (the list of scenarios)
+    this.props.removeSession(this.state.session);
+    this.props.history.push("/");
   }
 
   run = async (e: MouseEvent) => {
@@ -104,8 +138,10 @@ class ScenarioDetail extends Component<Props, State> {
     }
 
     const scenario = this.state.scenario;
-    const scenarioName = this.state.scenarioName;
     const scenarioError = this.state.scenarioError;
+    // Get scenarioName from this.state.session.scenario - this will be defined even
+    // when this.state.scenario is null (because it failed to load)
+    const scenarioName = this.state.session.scenario.name;
 
     return (
       <>
@@ -120,10 +156,10 @@ class ScenarioDetail extends Component<Props, State> {
 
         <IonContent>
           <div className="ion-padding about-info">
-            <h4>Scenario {scenarioName}</h4>
+            <h4>Scenario: {scenarioName}</h4>
 
             <p>
-              { scenario ? scenario.description : scenarioError }
+              { scenario ? scenario.description : (<IonText color="error">{scenarioError}</IonText>) }
             </p>
 
             { scenario &&
@@ -138,7 +174,7 @@ class ScenarioDetail extends Component<Props, State> {
 
             <IonButton
               color="light"
-              onClick={(e: MouseEvent) => this.cancel(e)}>
+              onClick={(e: MouseEvent) => this.close(e)}>
 
               Close
             </IonButton>
@@ -153,7 +189,10 @@ class ScenarioDetail extends Component<Props, State> {
                   <IonItem
                     key={step.name}
                   >
-                    {step.name}
+                    <IonLabel>
+                      <h3>{step.name}</h3>
+                      <p>{step.description}</p>
+                    </IonLabel>
                   </IonItem>
               ))}
             </IonList>
@@ -164,5 +203,8 @@ class ScenarioDetail extends Component<Props, State> {
   }
 }
 
-export default withRouter(ScenarioDetail);
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SessionPage));
 

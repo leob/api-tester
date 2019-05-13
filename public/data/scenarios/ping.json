@@ -5,7 +5,8 @@
     "steps": [
       {
         "name": "ping",
-        "operation": "ping"
+        "operation": "ping",
+        "description": "the Ping operation"
       }
     ]
   }

@@ -1,20 +1,31 @@
 import React from 'react';
-import { IonIcon, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent,
-         IonList, IonListHeader, IonItem, IonItemDivider, IonLabel, IonMenuToggle } from '@ionic/react';
 import { RouteComponentProps, withRouter } from 'react-router';
+
+import { IonIcon, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent,
+         IonList, IonListHeader, IonItem, IonLabel, IonMenuToggle } from '@ionic/react';
+
+import { connect } from 'react-redux';
+import { RootState } from '../store';
+
+import { Session } from '../store/sessions/types';
+
+const mapStateToProps = (state: RootState) => ({
+  sessions: state.sessions.sessions
+});
+
+type Props = RouteComponentProps<{}> & ReturnType<typeof mapStateToProps>;
+//type Props = RouteComponentProps<{}>;
 
 const routes = {
   appPages: [
     { title: 'Scenarios', path: '/', icon: 'calendar' },
     { title: 'About', path: '/about', icon: 'information-circle' }
   ]
-}
+};
 
-type Props = RouteComponentProps<{}>;
+const Menu: React.SFC<Props> = ({ history, sessions }) => {
 
-const Menu: React.SFC<Props> = ({ history }) => {
-
-  function renderlistItems(list: any[]) {
+  function renderListItems(list: any[]) {
     return list
       .filter(route => !!route.path)
       .map((p) => (
@@ -29,6 +40,26 @@ const Menu: React.SFC<Props> = ({ history }) => {
       ));
   }
 
+  function renderSessionItems(sessions: Session[]) {
+    return sessions
+      .map((session) => (
+        <IonMenuToggle key={session.id} auto-hide="false">
+          <IonItem button onClick={() => selectSession(session)}>
+            <IonIcon slot="start" name="list-box"></IonIcon>
+            <IonLabel>
+              {session.scenario.name}
+            </IonLabel>
+          </IonItem>
+        </IonMenuToggle>
+      ));
+  }
+
+  function selectSession(session: Session) {
+    history.push(`/sessions/${session.id}`);
+  }
+
+  const hasSessions = sessions.length > 0;
+
   return (
     <IonMenu contentId="main">
       <IonHeader>
@@ -41,13 +72,26 @@ const Menu: React.SFC<Props> = ({ history }) => {
           <IonListHeader>
             Navigate
           </IonListHeader>
-          { renderlistItems(routes.appPages) }
+          { renderListItems(routes.appPages) }
         </IonList>
-        <IonList lines="none"></IonList>
+
+        {hasSessions ? (
+          <IonList>
+            <IonListHeader>
+              Sessions
+            </IonListHeader>
+            { renderSessionItems(sessions) }
+          </IonList>
+        ) : (
+          <IonList lines="none"></IonList>
+        )}
+
       </IonContent>
     </IonMenu>
   );
 }
 
-export default withRouter(Menu);
+export default withRouter(connect(
+  mapStateToProps
+)(Menu));
 

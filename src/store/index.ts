@@ -3,37 +3,36 @@ import { combineReducers, createStore, applyMiddleware, compose, Middleware } fr
 
 // Scenarios module
 import * as scenarioActions from './scenarios/actions';
-import * as scenarioSelectors from './scenarios/selectors';
 import { middlewares as scenarioMiddlewares } from './scenarios/middleware';
 import scenarios from './scenarios/reducer';
 
 // Sessions module
-// import * as sessionActions from './sessions/actions';
-// import * as sessionSelectors from './sessions/selectors';
-// import { middlewares as sessionMiddlewares } from './sessions/middleware';
-// import sessions from './sessions/reducer';
+import * as sessionActions from './sessions/actions';
+import * as sessionSelectors from './sessions/selectors';
+import { middlewares as sessionMiddlewares } from './sessions/middleware';
+import sessions from './sessions/reducer';
 
 // Actions
 export const actions = {
-  scenarios: scenarioActions
-  // sessions: sessionActions
+  scenarios: scenarioActions,
+  sessions: sessionActions
 }
 
 // Selectors
 export const selectors = {
-  scenarios: scenarioSelectors
-  // sessions: sessionSelectors
+  // scenarios: scenarioSelectors,
+  sessions: sessionSelectors
 };
 
 // Middlewares
 const middlewares: Middleware[] = ([] as Middleware[])
-  .concat(scenarioMiddlewares);
-  // .concat(sessionMiddlewares);
+  .concat(scenarioMiddlewares)
+  .concat(sessionMiddlewares);
 
 // Reducers
-export const rootReducer = combineReducers({
-  scenarios
-  // sessions
+const rootReducer = combineReducers({
+  scenarios,
+  sessions
 });
 
 // Store
@@ -41,11 +40,14 @@ export const rootReducer = combineReducers({
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 function configureStore(initialState?: {}) {
-  return createStore(
+
+  const store = createStore(
     rootReducer,
     initialState,
     composeEnhancers(applyMiddleware(...middlewares))
   );
+
+  return store;
 }
 
 // store; pass an optional param to rehydrate state on app start

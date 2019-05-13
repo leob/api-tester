@@ -18,19 +18,26 @@ import {
 import { connect } from 'react-redux';
 import { RootState, actions } from '../store';
 
+import { Scenario } from '../store/scenarios/types';
+import { Session } from '../store/sessions/types';
+
+// UUID package uses CommonJS
+const uuidv4 = require('uuid/v4');
+
 const mapStateToProps = (state: RootState) => ({
   scenarios: state.scenarios.scenarios,
   scenarioError: state.scenarios.scenarioError
 });
 
 const mapDispatchToProps = {
-  updateScenarios: (/*dummyTestValue*/) => actions.scenarios.updateScenarios(/*dummyTestValue*/)
-}
+  updateScenarios: (/*dummyTestValue*/) => actions.scenarios.updateScenarios(/*dummyTestValue*/),
+  addSession: (session) => actions.sessions.addSession(session)
+};
 
 type Props = RouteComponentProps<{}> & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
 type State = {}
 
-class Main extends Component<Props, State> {
+class Scenarios extends Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
@@ -40,12 +47,22 @@ class Main extends Component<Props, State> {
     this.state = {};
   }
 
-  goToLink = (e: MouseEvent) => {
+  selectScenario = (e: MouseEvent, scenario: Scenario) => {
     if (!e.currentTarget) {
       return;
     }
     e.preventDefault();
-    this.props.history.push((e.currentTarget as HTMLAnchorElement).href);
+
+    const sessionId = uuidv4();
+
+    const session: Session = {
+      id: sessionId,
+      scenario: scenario
+    }
+
+    this.props.addSession(session);
+
+    this.props.history.push(`/sessions/${sessionId}`);
   };
 
   render() {
@@ -81,9 +98,9 @@ class Main extends Component<Props, State> {
             ) : (
                 this.props.scenarios.map(scenario => (
                   <IonItem
-                    href={`/scenarios/${scenario.name}`}
+                    href="#"
                     key={scenario.name}
-                    onClick={this.goToLink}
+                    onClick={(e) => this.selectScenario(e, scenario)}
                   >
                     <IonLabel>
                       <h3>{scenario.name}</h3>
@@ -101,5 +118,5 @@ class Main extends Component<Props, State> {
 export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(Main));
+)(Scenarios));
 

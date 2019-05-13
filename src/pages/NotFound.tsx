@@ -9,9 +9,7 @@ import {
   IonContent,
 } from '@ionic/react';
 
-import config from '../config';
-
-class About extends Component<{}, {}> {
+class NotFound extends Component<{}, {}> {
 
   render() {
 
@@ -22,16 +20,16 @@ class About extends Component<{}, {}> {
             <IonButtons slot="start">
               <IonMenuButton></IonMenuButton>
             </IonButtons>
-            <IonTitle>About</IonTitle>
+            <IonTitle>Page not found</IonTitle>
           </IonToolbar>
         </IonHeader>
 
         <IonContent>
           <div className="ion-padding">
-            <h4>{config.APP_TITLE}</h4>
+            <h4>Not Found</h4>
 
             <p>
-              This is the API tester
+              The page was not found
             </p>
           </div>
         </IonContent>
@@ -40,5 +38,5 @@ class About extends Component<{}, {}> {
   }
 }
 
-export default About;
+export default NotFound;
 

@@ -17,12 +17,16 @@
     "axios": "^0.18",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-hot-loader": "next",
     "react-redux": "^5.1.1",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "redux": "^4.0.1",
     "typesafe-actions": "^4.2.0",
-    "react-hot-loader": "next"
+    "uuid": "^3.3.2"
+  },
+  "resolutions": {
+    "babel-jest": "24.7.1"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -1,6 +1,6 @@
 import { hot } from "react-hot-loader";
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
 import '@ionic/core/css/core.css';
@@ -13,9 +13,11 @@ import store from './store';
 
 import Menu from './components/Menu';
 
-import Main from './pages/Main';
 import About from './pages/About';
-import ScenarioDetail from './pages/ScenarioDetail';
+import NotFound from './pages/NotFound';
+
+import Scenarios from './pages/Scenarios';
+import Session from './pages/Session';
 
 class App extends Component {
 
@@ -28,9 +30,11 @@ class App extends Component {
               <Menu />
               <IonPage id="main">
                 <Switch>
-                  <Route path="/" component={Main} exact={true} />
-                  <Route path="/scenarios/:name" component={ScenarioDetail} />
+                  <Route exact path="/" render={() => <Redirect to="/scenarios"/>}/>
+                  <Route exact path="/scenarios" component={Scenarios} />
+                  <Route path="/sessions/:sessionId" component={Session} />
                   <Route path="/about" component={About} />
+                  <Route component={NotFound} />
                 </Switch>
               </IonPage>
             </IonSplitPane>
