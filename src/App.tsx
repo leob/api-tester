@@ -1,3 +1,4 @@
+import { hot } from "react-hot-loader";
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -6,7 +7,7 @@ import '@ionic/core/css/core.css';
 import '@ionic/core/css/ionic.bundle.css';
 import './theme.css';
 
-import { IonApp, IonSplitPane, IonPage, IonRouterOutlet } from '@ionic/react';
+import { IonApp, IonSplitPane, IonPage } from '@ionic/react';
 
 import store from './store';
 
@@ -40,4 +41,6 @@ class App extends Component {
   }
 }
 
-export default App;
+// React hot reloading - this can be kept in production, no need to deactivate it
+export default hot(module)(App);
+

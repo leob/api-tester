@@ -21,12 +21,10 @@ import { RootState, actions } from '../store';
 const mapStateToProps = (state: RootState) => ({
   scenarios: state.scenarios.scenarios,
   scenarioError: state.scenarios.scenarioError
-  // selectedScenario: state.scenarios.selectedScenario
 });
 
 const mapDispatchToProps = {
   updateScenarios: (/*dummyTestValue*/) => actions.scenarios.updateScenarios(/*dummyTestValue*/)
-  // setSelectedScenario: (scenario: Scenario) => actions.scenarios.setSelectedScenario(scenario),
 }
 
 type Props = RouteComponentProps<{}> & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
@@ -91,9 +89,6 @@ class Main extends Component<Props, State> {
                       <h3>{scenario.name}</h3>
                       <p>{scenario.description}</p>
                     </IonLabel>
-                    {/* <IonNote slot="end">
-                      {scenario.description}
-                    </IonNote> */}
                   </IonItem>
             )))}
             </IonList>

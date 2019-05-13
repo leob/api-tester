@@ -9,6 +9,8 @@ import {
   IonContent,
 } from '@ionic/react';
 
+import config from '../config';
+
 class Aboout extends Component<{}, {}> {
 
   render() {
@@ -26,10 +28,10 @@ class Aboout extends Component<{}, {}> {
 
         <IonContent>
           <div className="ion-padding">
-            <h4>Umpyre API tester</h4>
+            <h4>{config.APP_TITLE}</h4>
 
             <p>
-              This is the Umpyre API tester
+              This is the API tester
             </p>
           </div>
         </IonContent>
