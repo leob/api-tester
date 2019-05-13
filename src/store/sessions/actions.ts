@@ -13,5 +13,9 @@ export const addSession = createAction('sessions/ADD_SESSION', action =>
 );
 
 export const removeSession = createAction('sessions/REMOVE_SESSION', action =>
-  (session: Session) => action(session)
+  (sessionId: string) => action(sessionId)
 );
+
+// export const updateSession = createAction('sessions/UPDATE_SESSION', action =>
+//   (session: Session) => action(session)
+// );

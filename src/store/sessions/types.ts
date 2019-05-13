@@ -2,7 +2,8 @@ import { Scenario } from '../scenarios/types';
 
 export interface Session {
   id: string;
-  scenario: Scenario;
+  scenarioName: string;
+  scenario?: Scenario;
 }
 
 export interface SessionState {

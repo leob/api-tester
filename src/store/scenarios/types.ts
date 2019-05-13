@@ -1,7 +1,15 @@
+export type ScenarioStepResult = {
+  isError: boolean;
+  data?: any;
+  status?: number;
+  error?: string;
+};
+
 export interface ScenarioStep {
   name: string;
   description?: string;
   operation: string;
+  result?: ScenarioStepResult;
 }
 
 export interface ScenarioDefinition {

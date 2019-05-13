@@ -2,7 +2,7 @@ import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 
 import { IonIcon, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent,
-         IonList, IonListHeader, IonItem, IonLabel, IonMenuToggle } from '@ionic/react';
+         IonList, IonListHeader, IonItem, IonLabel, IonNote, IonMenuToggle } from '@ionic/react';
 
 import { connect } from 'react-redux';
 import { RootState } from '../store';
@@ -42,13 +42,16 @@ const Menu: React.SFC<Props> = ({ history, sessions }) => {
 
   function renderSessionItems(sessions: Session[]) {
     return sessions
-      .map((session) => (
+      .map((session, index) => (
         <IonMenuToggle key={session.id} auto-hide="false">
           <IonItem button onClick={() => selectSession(session)}>
             <IonIcon slot="start" name="list-box"></IonIcon>
             <IonLabel>
-              {session.scenario.name}
+              {session.scenarioName}
             </IonLabel>
+            <IonNote slot="end">
+              {"(session " + (index+1) + ")"}
+            </IonNote>
           </IonItem>
         </IonMenuToggle>
       ));

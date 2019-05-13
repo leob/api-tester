@@ -6,12 +6,10 @@ import { AxiosRequestConfig } from 'axios';
 const URL = config.API_URL;
 
 export type Result = {
-  isError: true,
-  error: Error
-} | {
-  isError: false,
-  data: any,
-  status?: number
+  isError: boolean;
+  data?: any;
+  status?: number;
+  error?: Error;
 };
 
 type RequestParams = {

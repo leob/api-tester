@@ -11,8 +11,8 @@ import {
   IonList,
   IonListHeader,
   IonLabel,
-  // IonNote,
-  IonItem
+  IonItem,
+  IonToast
 } from '@ionic/react';
 
 import { connect } from 'react-redux';
@@ -26,7 +26,8 @@ const uuidv4 = require('uuid/v4');
 
 const mapStateToProps = (state: RootState) => ({
   scenarios: state.scenarios.scenarios,
-  scenarioError: state.scenarios.scenarioError
+  scenarioError: state.scenarios.scenarioError,
+  sessions: state.sessions.sessions
 });
 
 const mapDispatchToProps = {
@@ -35,16 +36,46 @@ const mapDispatchToProps = {
 };
 
 type Props = RouteComponentProps<{}> & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
-type State = {}
+
+type State = {
+  showAlert: boolean;
+  alertHeader?: string;
+  alertMessage?: string
+}
+
+const MAX_SESSIONS = 5;
 
 class Scenarios extends Component<Props, State> {
+
+  defaultState: State = {
+    showAlert: false,
+    alertHeader: '',
+    alertMessage: undefined
+  }
 
   constructor(props: Props) {
     super(props);
 
     props.updateScenarios(/*"a dummy test value, not used"*/);
 
-    this.state = {};
+    this.state = {
+      ...this.defaultState
+    };
+  }
+
+  dismissAlert = () => {
+    this.setState({
+      ...this.defaultState
+    });
+  }
+
+  showAlert = (header: string, message: string) => {
+
+    this.setState({
+      showAlert: true,
+      alertHeader: header,
+      alertMessage: message
+    });
   }
 
   selectScenario = (e: MouseEvent, scenario: Scenario) => {
@@ -53,16 +84,23 @@ class Scenarios extends Component<Props, State> {
     }
     e.preventDefault();
 
-    const sessionId = uuidv4();
+    if (this.props.sessions.length >= MAX_SESSIONS) {
 
-    const session: Session = {
-      id: sessionId,
-      scenario: scenario
+      this.showAlert("Cannot add a session",
+        "You can add up to 5 sessions - please close another session and try again");
+
+    } else {
+
+      const sessionId = uuidv4();
+
+      const session: Session = {
+        id: sessionId,
+        scenarioName: scenario.name
+      }
+
+      this.props.addSession(session);
+      this.props.history.push(`/sessions/${sessionId}`);
     }
-
-    this.props.addSession(session);
-
-    this.props.history.push(`/sessions/${sessionId}`);
   };
 
   render() {
@@ -74,6 +112,16 @@ class Scenarios extends Component<Props, State> {
 
     return (
       <>
+        <IonToast
+          position="top"
+          color="secondary"
+          duration={3000}
+          isOpen={this.state.showAlert}
+          header={this.state.alertHeader}
+          message={this.state.alertMessage}
+          onDidDismiss={this.dismissAlert}
+        ></IonToast>
+
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
