@@ -27,7 +27,7 @@ import operations from '../operations';
 import { Result } from '../operations';
 
 const mapStateToProps = (state: RootState) => ({
-  sessions: state.sessions.sessions,
+  sessions: state.sessions.data,
   findSession: (sessionId) => selectors.sessions.findSession(state.sessions, sessionId)
 });
 
@@ -40,13 +40,16 @@ const mapDispatchToProps = {
 type BaseProps = { sessionId: string };
 type Props = RouteComponentProps<BaseProps> & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
 
-type State = {
-  showLoading: boolean;
+type SessionState = {
   session: Session | null;
   sessionIndex: number | null;
   scenarioName: string | null;
   scenarioError: string | null;
-}
+};
+
+type State = {
+  showLoading: boolean;
+} & SessionState;
 
 class SessionPage extends Component<Props, State> {
 
@@ -85,13 +88,13 @@ class SessionPage extends Component<Props, State> {
 
     // If the session was not found then set error state
     if (!session) {
-      this.setState(() => ({ session: null, sessionIndex: null, scenarioName: null, scenarioError: "Session not found" }));
+      this.setSessionState({ session: null, sessionIndex: null, scenarioName: null, scenarioError: "Session not found"});
       return;
     }
 
-    // If the scenario was already loaded (into the session)
+    // If the scenario was already loaded (into the session) then we're done
     if (session.scenario) {
-      this.setState(() => ({ session, sessionIndex: index, scenarioName: session.scenarioName, scenarioError: null }));
+      this.setSessionState({ session, sessionIndex: index, scenarioName: session.scenarioName, scenarioError: null });
       return;
     }
 
@@ -102,21 +105,27 @@ class SessionPage extends Component<Props, State> {
       const response = await fetch('/data/scenarios/' + scenarioName + '.json');
       const scenario: Scenario = await response.json();
 
-      // Update the session object - because this is a reference retrieved from the store,
-      // the data in the store is also up to date, automatically (since it's the same object, not a copy)
+      // NOTE - we're breaking all the rules here with regards to Redux! This is just a quick hack to get stuff done.
+      // We're updating the session object - because this is an object reference retrieved from the store, the data in
+      // the store is also updated, automatically (since it's the same object, not a copy).
+      // ** TODO fix this - it goes completely against Redux's immutability principles **
       session.scenario = scenario;
-      // this.props.updateSession(session);   // So this isn't needed ...
+      // this.props.updateSession(session);   // So this call wassn't needed now ... however TODO fix this later!
 
-      this.setState(() => ({ session, sessionIndex: index, scenarioName, scenarioError: null }));
+      this.setSessionState({ session, sessionIndex: index, scenarioName: session.scenarioName, scenarioError: null });
 
     } catch (ex) {
       const e: Error = ex;
       const message = "Unabled to load the scenario: " + e.message;
 
-      this.setState(() => ({ session: null, sessionIndex: index, scenarioName, scenarioError: message }));
+      this.setSessionState({ session: null, sessionIndex: index, scenarioName, scenarioError: message });
     }
 
     return;
+  }
+
+  setSessionState({ session, sessionIndex, scenarioName, scenarioError }: SessionState) {
+    this.setState(() => ({ session, sessionIndex, scenarioName, scenarioError }));
   }
 
   close = (e: MouseEvent) => {
@@ -138,7 +147,7 @@ class SessionPage extends Component<Props, State> {
     // Wait a few seconds before closing the loader/spinner, in case "executeScenario" takes only a fraction of a second
     setTimeout(() => {
       this.setState(() => ({ showLoading: false }));
-    }, 2000);
+    }, 1500);
   }
 
   // TODO move this to a separate 'scenarios' module (similar to 'operations') which knows how to execute scenarios; this
@@ -148,6 +157,11 @@ class SessionPage extends Component<Props, State> {
 
     for (step of scenario.definition.steps) {
       let result = await this.executeScenarioStep(step);
+
+      // NOTE - we're breaking all the rules here with regards to Redux! This is just a quick hack to get stuff done.
+      // We're updating the step object within the scenario object within the session object - because this is an object
+      // reference, the data in the store is also updated, automatically (since it's the same object, not a copy).
+      // ** TODO fix this - it goes completely against Redux's immutability principles **
       step.result = result;
     }
   }

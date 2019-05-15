@@ -3,32 +3,33 @@ import { ActionType, getType } from 'typesafe-actions';
 import { ScenarioState } from './types';
 
 const defaultState: ScenarioState = {
-  // selectedScenario: null,
-  scenarios: [],
-  scenarioError: null
+  loading: false,
+  error: null,
+  data: []
 };
 
 export type ScenarioAction = ActionType<typeof scenarios>;
 
 export default (state = defaultState, action: ScenarioAction): ScenarioState => {
   switch (action.type) {
+    case getType(scenarios.fetchScenarios.request):
+      return {
+        ...state,
+        loading: true,
+        error: null
+      }
     case getType(scenarios.fetchScenarios.success):
       return {
         ...state,
-        scenarios: action.payload,
-        scenarioError: null
+        loading: false,
+        error: null,
+        data: action.payload,
       }
-      case getType(scenarios.fetchScenarios.failure):
+    case getType(scenarios.fetchScenarios.failure):
       return {
         ...state,
-        scenarioError: action.payload.message,
-        scenarios: []
+        error: action.payload.message,
       }
-    // case getType(scenarios.setSelectedScenario):
-    //   return {
-    //     ...state,
-    //     selectedScenario: action.payload
-    //   }
     default:
       return state;
   }

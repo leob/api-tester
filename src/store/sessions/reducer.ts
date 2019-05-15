@@ -3,7 +3,7 @@ import { ActionType, getType } from 'typesafe-actions';
 import { SessionState } from './types';
 
 const defaultState: SessionState = {
-  sessions: []
+  data: []
 }
 
 export type SessionAction = ActionType<typeof sessions>;
@@ -13,34 +13,38 @@ export default (state = defaultState, action: SessionAction): SessionState => {
   case getType(sessions.addSession):
     return {
       ...state,
-      sessions: [ ...state.sessions, action.payload ]
+      data: [ ...state.data, action.payload ]
     };
   case getType(sessions.removeSession):
     return {
       ...state,
-      sessions: state.sessions.filter(session => session.id !== action.payload)
+      data: state.data.filter(session => session.id !== action.payload)
     };
-  // //
-  // // NOTE:
-  // //
-  // // "updateSession" may actually not be needed: if we retrieve a reference to the session from the
-  // // store, then we can use that reference to DIRECTLY update the properties of the session, in the store -
-  // // we're working with a reference to the object, not a copy of it (although this probably goes against the
-  // // "immutability" principle of Redux!)
-  // //
+  //
+  // NOTE:
+  //
+  // "updateSession" is not needed **at this moment**: right now, we're retrieving an object reference to the session
+  // from the store, and we use that object reference to DIRECTLY update the properties of the session, IN THE STORE -
+  // this works because we're working with a reference to the object, not a copy of it.
+  //
+  // However:
+  //
+  // ** TODO fix this - it goes completely against Redux's immutability principles! **
+  // See: https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
+  //
   // case getType(sessions.updateSession):
-  //   const index = state.sessions.findIndex(session => session.id === action.payload.id);
+  //   const index = state.data.findIndex(session => session.id === action.payload.id);
 
   //   // Recompose "sessions" by inserting the updated session at the right position (index)
   //   const updatedSessions = [
-  //     ...state.sessions.slice(0, index),
+  //     ...state.data.slice(0, index),
   //     action.payload,
-  //     ...state.sessions.slice(index + 1)
+  //     ...state.data.slice(index + 1)
   //   ];
 
   //   return {
   //     ...state,
-  //     sessions: updatedSessions
+  //     data: updatedSessions
   //   };
   default:
     return state;

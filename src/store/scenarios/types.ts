@@ -1,3 +1,6 @@
+// ** TODO we have nested state here which goes against Redux's "normalization" principle - fix this "later"! **
+// (see: https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape)
+
 export type ScenarioStepResult = {
   isError: boolean;
   data?: any;
@@ -23,7 +26,7 @@ export interface Scenario {
 }
 
 export interface ScenarioState {
-  // selectedScenario: Scenario | null;
-  scenarios: Scenario[];
-  scenarioError: string | null;
+  loading: boolean;
+  error: string | null;
+  data: Scenario[];
 }

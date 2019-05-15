@@ -25,9 +25,9 @@ import { Session } from '../store/sessions/types';
 const uuidv4 = require('uuid/v4');
 
 const mapStateToProps = (state: RootState) => ({
-  scenarios: state.scenarios.scenarios,
-  scenarioError: state.scenarios.scenarioError,
-  sessions: state.sessions.sessions
+  scenarios: state.scenarios.data,
+  scenarioError: state.scenarios.error,
+  sessions: state.sessions.data
 });
 
 const mapDispatchToProps = {
