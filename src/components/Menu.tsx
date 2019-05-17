@@ -14,7 +14,6 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 type Props = RouteComponentProps<{}> & ReturnType<typeof mapStateToProps>;
-//type Props = RouteComponentProps<{}>;
 
 const routes = {
   appPages: [
@@ -92,7 +91,7 @@ const Menu: React.SFC<Props> = ({ history, sessions }) => {
       </IonContent>
     </IonMenu>
   );
-}
+};
 
 export default withRouter(connect(
   mapStateToProps

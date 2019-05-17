@@ -9,10 +9,6 @@ import {
   IonButton,
   IonTitle,
   IonContent,
-  IonList,
-  IonListHeader,
-  IonLabel,
-  IonItem,
   IonText,
   IonLoading
 } from '@ionic/react';
@@ -23,6 +19,8 @@ import { RootState, actions, selectors } from '../store';
 import { Session } from '../store/sessions/types';
 import { Scenario, ScenarioStep, ScenarioStepResult } from '../lib/types';
 import { executeScenario } from '../lib/scenario-runner';
+
+import ScenarioResults from '../components/ScenarioResults';
 
 const mapStateToProps = (state: RootState) => ({
   findSession: (sessionId) => selectors.sessions.findSession(state.sessions, sessionId)
@@ -250,30 +248,12 @@ class SessionPage extends Component<Props, State> {
           </div>
 
           { scenario &&
-            <IonList>
-              <IonListHeader color="light">
-                <IonLabel>Steps for {scenarioName}</IonLabel>
-              </IonListHeader>
-              { session.scenarioSteps.map((step, index) => (
-                  <IonItem
-                    key={step.name}
-                  >
-                    <IonLabel>
-                      <h3>{step.name}</h3>
-                      <p>{step.description}</p>
-                      {session.scenarioStepResults[index] && (
-
-                        <IonText color={session.scenarioStepResults[index].isError ? 'danger' : 'success'}>
-                          {session.scenarioStepResults[index].isError
-                            ? "Result: failure, message: " + session.scenarioStepResults[index].error
-                            : "Result: success, status code: " + session.scenarioStepResults[index].status}
-                        </IonText>
-                  )}
-                    </IonLabel>
-                  </IonItem>
-              ))}
-            </IonList>
-          }
+              <ScenarioResults
+                scenarioName={scenarioName}
+                scenarioSteps={session.scenarioSteps}
+                scenarioStepResults={session.scenarioStepResults}
+              />
+            }
         </IonContent>
       </>
     );
