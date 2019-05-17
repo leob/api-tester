@@ -1,31 +1,5 @@
 import { Scenario } from '../scenarios/types';
-
-// ** TODO we have nested state here which goes against Redux's "normalization" principle - fix this "later"! **
-// (see: https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape)
-
-// READONLY copy of the scenario step definition loaded from the scenario's JSON file
-export interface ScenarioStep {
-  name: string;
-  description?: string;
-  operation: string;
-}
-
-// READONLY copy of the scenario definition loaded from the scenario's JSON file
-export interface ScenarioDefinition {
-}
-
-// READ/WRITE - this object will be mutated within the session
-export type ScenarioResult = {
-}
-
-// READ/WRITE - this object will be mutated within the session
-export type ScenarioStepResult = {
-  stepName: string;
-  isError: boolean;
-  data?: any;
-  status?: number;
-  error?: string;
-};
+import { ScenarioDefinition, ScenarioStep, ScenarioResult, ScenarioStepResult } from '../../lib/types';
 
 //
 // NOTE:

@@ -20,24 +20,9 @@ import {
 import { connect } from 'react-redux';
 import { RootState, actions, selectors } from '../store';
 
-import { Session, ScenarioStep, ScenarioStepResult } from '../store/sessions/types';
-
-import operations from '../operations';
-import { Result } from '../operations';
-
-// This models the "unnormalized" (nested, non-flat) data that we're reading from the JSON file
-type ScenarioModel = {
-  name: string;
-  description: string;
-  definition: {},
-  steps: [
-    {
-      name: string;
-      description?: string;
-      operation: string;
-    }
-  ]
-};
+import { Session } from '../store/sessions/types';
+import { Scenario, ScenarioStep, ScenarioStepResult } from '../lib/types';
+import { executeScenario } from '../lib/scenario-runner';
 
 const mapStateToProps = (state: RootState) => ({
   findSession: (sessionId) => selectors.sessions.findSession(state.sessions, sessionId)
@@ -109,25 +94,15 @@ class SessionPage extends Component<Props, State> {
 
     try {
       const response = await fetch('/data/scenarios/' + scenarioName + '.json');
-      const scenarioData: ScenarioModel = await response.json();
+      const scenarioData: Scenario = await response.json();
 
-      // NOTE - we're breaking all the rules here with regards to Redux! This is just a quick hack to get stuff done.
-      // We're updating the session object - because this is an object reference retrieved from the store, the data in
-      // the store is also updated, automatically (since it's the same object, not a copy).
-      // ** TODO fix this - it goes completely against Redux's immutability principles **
-      session.isLoaded = true;
-      session.isError = false;
-      session.error = null;
-      this.setSessionData(session, scenarioData);
+      this.populateSession(session, true, false, null, scenarioData);
 
     } catch (ex) {
       const e: Error = ex;
       const message = "Unabled to load the scenario: " + e.message;
 
-      session.isLoaded = false;
-      session.isError = true;
-      session.error = message;
-      this.setSessionData(session, null);
+      this.populateSession(session, false, true, message, null);
     }
 
     // Update the local state ...
@@ -138,30 +113,36 @@ class SessionPage extends Component<Props, State> {
     return;
   }
 
-  // Copy/clone the data from the ScenarioModel into the Session (we don't copy references but data - Redux!)
-  setSessionData(session: Session, data: ScenarioModel) {
+  // 'Populate' the (initially incomplete) Session object so it becomes a complete, "valid" Session
+  populateSession(session: Session, isLoaded: boolean, isError: boolean, error: string, data: Scenario) {
 
+    session.isLoaded = isLoaded;
+    session.isError = isError;
+    session.error = error;
+
+    session.scenario = null;
+    session.scenarioDefinition = null;
+    session.scenarioSteps = null;
+
+    // no data, nothing more to do
     if (data === null) {
-      session.scenario = null;
-      session.scenarioDefinition = null;
-      session.scenarioSteps = null;
-
       return;
     }
 
-    // 'Unmarshal'/denormalize the JSON data into the flattened Session structure
+    // Copy/clone the data from the ScenarioModel into the Session (we don't copy references,
+    // but data - Redux!) - 'unmarshal'/denormalize the JSON data into the flattened Session structure
 
-    // copy the data
+    // Copy the data
     session.scenario = {
       name: data.name,
       description: data.description
     };
 
-    // TODO  empty for now
+    // Copy the definition - TODO  empty for now
     session.scenarioDefinition = {};
 
-    // copy/clone the steps
-    const steps: ScenarioStep[] = data.steps.reduce(
+    // Copy/clone the steps
+    session.scenarioSteps = data.steps.reduce(
       (steps, step) => {
         // copy the data
         steps.push({
@@ -173,8 +154,6 @@ class SessionPage extends Component<Props, State> {
         return steps;
       }, [] as ScenarioStep[]
     );
-
-    session.scenarioSteps = steps;
 
     // Initialize step results (empty array)
     session.scenarioStepResults = [];
@@ -193,7 +172,7 @@ class SessionPage extends Component<Props, State> {
 
     this.setState(() => ({ showLoading: true }));
 
-    const results: ScenarioStepResult[] = await this.executeScenario(this.state.session);
+    const results: ScenarioStepResult[] = await executeScenario(this.state.session.scenarioSteps);
 
     let session = this.state.session;
 
@@ -211,53 +190,6 @@ class SessionPage extends Component<Props, State> {
     setTimeout(() => {
       this.setState(() => ({ showLoading: false, session: updatedSession, sessionIndex }));
     }, 1500);
-  }
-
-  // TODO move this to a separate 'scenarios' module (similar to 'operations') which knows how to execute scenarios; this
-  // module (plain JS, not React) could also be used as a 'standalone' node.js module, so as a CLI tool without the UI
-  async executeScenario(session: Session): Promise<ScenarioStepResult[]> {
-    let step: ScenarioStep;
-    let results: ScenarioStepResult[] = [];
-
-    for (step of session.scenarioSteps) {
-      let result = await this.executeScenarioStep(step);
-
-      results.push(result);
-    }
-
-    return results;
-  }
-
-  async executeScenarioStep(scenarioStep: ScenarioStep): Promise<ScenarioStepResult> {
-    const name = scenarioStep.operation;
-    const operation = operations[name];
-    let stepResult: ScenarioStepResult;
-
-    if (!operation) {
-
-      stepResult = {
-        stepName: scenarioStep.name,
-        isError: true,
-        error: "Operation not defined"
-      }
-
-    } else {
-      const result: Result = await operation();
-
-      stepResult = {
-        stepName: scenarioStep.name,
-        isError: result.isError
-      }
-
-      if (result.isError) {
-        stepResult.error = result.error.message;
-      } else {
-        stepResult.data = result.data;
-        stepResult.status = result.status;
-      }
-    }
-
-    return stepResult;
   }
 
   render() {

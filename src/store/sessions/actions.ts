@@ -1,5 +1,6 @@
 import { createAction } from 'typesafe-actions';
-import { Session, ScenarioStepResult } from './types';
+import { Session } from './types';
+import { ScenarioStepResult } from '../../lib/types';
 
 //
 // NOTE:

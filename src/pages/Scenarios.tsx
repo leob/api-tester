@@ -87,12 +87,11 @@ class Scenarios extends Component<Props, State> {
     if (this.props.sessions.length >= MAX_SESSIONS) {
 
       this.showAlert("Cannot add a session",
-        "You can add up to 5 sessions - please close another session and try again");
+        `You can add up to ${MAX_SESSIONS} sessions - please close another session and try again`);
 
     } else {
 
       const sessionId = uuidv4();
-
 
       // Create an 'incomplete' session, we need this to associate the sessionId with the scenario
       const session: Session = {
