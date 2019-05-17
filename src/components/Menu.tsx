@@ -10,7 +10,7 @@ import { RootState } from '../store';
 import { Session } from '../store/sessions/types';
 
 const mapStateToProps = (state: RootState) => ({
-  sessions: state.sessions.data
+  sessions: state.sessions.sessions
 });
 
 type Props = RouteComponentProps<{}> & ReturnType<typeof mapStateToProps>;

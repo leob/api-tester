@@ -1,51 +1,53 @@
 import * as sessions from './actions';
 import { ActionType, getType } from 'typesafe-actions';
-import { SessionState } from './types';
+import { SessionState, Session } from './types';
 
 const defaultState: SessionState = {
-  data: []
+  sessions: []
 }
 
 export type SessionAction = ActionType<typeof sessions>;
+
+function updatedSessions(state: SessionState, sessionId: string, session: Session): Session[] {
+  const index = state.sessions.findIndex(session => session.id === sessionId);
+
+  // Recompose "sessions" by inserting the updated session at the right position (index),
+  // meaning that we're completely replacing the session (remove and insert)
+  return [
+    ...state.sessions.slice(0, index),
+    session,
+    ...state.sessions.slice(index + 1)
+  ];
+}
 
 export default (state = defaultState, action: SessionAction): SessionState => {
   switch (action.type) {
   case getType(sessions.addSession):
     return {
       ...state,
-      data: [ ...state.data, action.payload ]
+      sessions: [ ...state.sessions, action.payload ]
     };
   case getType(sessions.removeSession):
     return {
       ...state,
-      data: state.data.filter(session => session.id !== action.payload)
+      sessions: state.sessions.filter(session => session.id !== action.payload)
     };
-  //
-  // NOTE:
-  //
-  // "updateSession" is not needed **at this moment**: right now, we're retrieving an object reference to the session
-  // from the store, and we use that object reference to DIRECTLY update the properties of the session, IN THE STORE -
-  // this works because we're working with a reference to the object, not a copy of it.
-  //
-  // However:
-  //
-  // ** TODO fix this - it goes completely against Redux's immutability principles! **
-  // See: https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns
-  //
-  // case getType(sessions.updateSession):
-  //   const index = state.data.findIndex(session => session.id === action.payload.id);
+  case getType(sessions.updateSession):
+    return {
+      ...state,
+      sessions: updatedSessions(state, action.payload.id, action.payload)
+    };
+  case getType(sessions.addSessionStepResult):
+    // Make a "shallow" copy
+    let session: Session = { ...action.payload.session };
 
-  //   // Recompose "sessions" by inserting the updated session at the right position (index)
-  //   const updatedSessions = [
-  //     ...state.data.slice(0, index),
-  //     action.payload,
-  //     ...state.data.slice(index + 1)
-  //   ];
+    // Replace step results (immutably)
+    session.scenarioStepResults = [ ...session.scenarioStepResults, action.payload.stepResult ];
 
-  //   return {
-  //     ...state,
-  //     data: updatedSessions
-  //   };
+    return {
+      ...state,
+      sessions: updatedSessions(state, action.payload.session.id, session)
+    };
   default:
     return state;
   }

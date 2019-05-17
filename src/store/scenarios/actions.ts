@@ -27,7 +27,7 @@ export const fetchScenarios = createAsyncAction(
   'scenarios/FETCH_FAILURE'
 )<void, Scenario[], Error>();
 
-// This is an async action, and its actual implementation is done in src/store/scenarios/middleware.ts
+// This is an async ("Thunk") action; its actual implementation ("handler") is done in src/store/scenarios/handlers.ts
 export const updateScenarios = createAction('scenarios/UPDATE_SCENARIOS', action =>
   (/*dummyTestValue: string*/) => action(/*dummyTestValue*/)
 );

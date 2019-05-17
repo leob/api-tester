@@ -5,7 +5,7 @@ import { ScenarioState } from './types';
 const defaultState: ScenarioState = {
   loading: false,
   error: null,
-  data: []
+  scenarios: []
 };
 
 export type ScenarioAction = ActionType<typeof scenarios>;
@@ -23,7 +23,7 @@ export default (state = defaultState, action: ScenarioAction): ScenarioState => 
         ...state,
         loading: false,
         error: null,
-        data: action.payload,
+        scenarios: action.payload,
       }
     case getType(scenarios.fetchScenarios.failure):
       return {

@@ -1,5 +1,5 @@
 import { createAction } from 'typesafe-actions';
-import { Session } from './types';
+import { Session, ScenarioStepResult } from './types';
 
 //
 // NOTE:
@@ -16,6 +16,10 @@ export const removeSession = createAction('sessions/REMOVE_SESSION', action =>
   (sessionId: string) => action(sessionId)
 );
 
-// export const updateSession = createAction('sessions/UPDATE_SESSION', action =>
-//   (session: Session) => action(session)
-// );
+export const updateSession = createAction('sessions/UPDATE_SESSION', action =>
+  (session: Session) => action(session)
+);
+
+export const addSessionStepResult = createAction('sessions/ADD_SESSION_STEP_RESULT', action =>
+  (session: Session, stepResult: ScenarioStepResult) => action({session, stepResult})
+);

@@ -25,9 +25,9 @@ import { Session } from '../store/sessions/types';
 const uuidv4 = require('uuid/v4');
 
 const mapStateToProps = (state: RootState) => ({
-  scenarios: state.scenarios.data,
+  scenarios: state.scenarios.scenarios,
   scenarioError: state.scenarios.error,
-  sessions: state.sessions.data
+  sessions: state.sessions.sessions
 });
 
 const mapDispatchToProps = {
@@ -43,7 +43,7 @@ type State = {
   alertMessage?: string
 }
 
-const MAX_SESSIONS = 5;
+const MAX_SESSIONS = 10;
 
 class Scenarios extends Component<Props, State> {
 
@@ -93,12 +93,17 @@ class Scenarios extends Component<Props, State> {
 
       const sessionId = uuidv4();
 
+
+      // Create an 'incomplete' session, we need this to associate the sessionId with the scenario
       const session: Session = {
         id: sessionId,
-        scenarioName: scenario.name
+        scenarioName: scenario.name,
+        isLoaded: false,
+        isError: false
       }
-
+      // add session to the store, the SessionPage will then load it from the store using the sessionId URL parameter
       this.props.addSession(session);
+
       this.props.history.push(`/sessions/${sessionId}`);
     }
   };
