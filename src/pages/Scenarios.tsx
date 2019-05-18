@@ -4,6 +4,8 @@ import { withRouter, RouteComponentProps } from 'react-router';
 import {
   IonHeader,
   IonToolbar,
+  IonIcon,
+  IonButton,
   IonButtons,
   IonMenuButton,
   IonTitle,
@@ -112,6 +114,8 @@ class Scenarios extends Component<Props, State> {
       return <></>;
     }
 
+    const buttonStyle = {textTransform: 'none'};
+
     const scenarioError = this.props.scenarioError;
 
     return (
@@ -150,14 +154,18 @@ class Scenarios extends Component<Props, State> {
             ) : (
                 this.props.scenarios.map(scenario => (
                   <IonItem
-                    href="#"
                     key={scenario.name}
-                    onClick={(e) => this.selectScenario(e, scenario)}
                   >
                     <IonLabel>
                       <h3>{scenario.name}</h3>
                       <p>{scenario.description}</p>
                     </IonLabel>
+                    <IonButton size="default" color="secondary" slot="end" style={buttonStyle}
+                        onClick={(e) => this.selectScenario(e, scenario)}>
+
+                      start&nbsp;
+                      <IonIcon name="arrow-dropright"></IonIcon>
+                    </IonButton>
                   </IonItem>
             )))}
             </IonList>

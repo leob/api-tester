@@ -162,7 +162,7 @@ class SessionPage extends Component<Props, State> {
 
     // We 'close' the session, so we remove it and we go back to the home page (the list of scenarios)
     this.props.removeSession(this.props.match.params.sessionId);
-    this.props.history.push("/");
+    this.props.history.goBack();
   }
 
   run = async (e: MouseEvent) => {

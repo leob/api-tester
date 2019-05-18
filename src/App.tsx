@@ -17,6 +17,7 @@ import About from './pages/About';
 import NotFound from './pages/NotFound';
 
 import Scenarios from './pages/Scenarios';
+import Sessions from './pages/Sessions';
 import Session from './pages/Session';
 
 class App extends Component {
@@ -32,6 +33,7 @@ class App extends Component {
                 <Switch>
                   <Route exact path="/" render={() => <Redirect to="/scenarios"/>}/>
                   <Route exact path="/scenarios" component={Scenarios} />
+                  <Route exact path="/sessions" component={Sessions} />
                   <Route path="/sessions/:sessionId" component={Session} />
                   <Route path="/about" component={About} />
                   <Route component={NotFound} />
