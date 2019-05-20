@@ -26,7 +26,7 @@ async function executeScenarioStep(scenarioStep: ScenarioStep): Promise<Scenario
     stepResult = {
       stepName: scenarioStep.name,
       isError: true,
-      error: "Operation not defined"
+      message: "Operation not defined"
     }
 
   } else {
@@ -38,7 +38,7 @@ async function executeScenarioStep(scenarioStep: ScenarioStep): Promise<Scenario
     }
 
     if (result.isError) {
-      stepResult.error = result.error.message;
+      stepResult.message = result.message;
     } else {
       stepResult.data = result.data;
       stepResult.status = result.status;

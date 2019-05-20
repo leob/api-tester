@@ -10,6 +10,7 @@ export type Result = {
   data?: any;
   status?: number;
   error?: Error;
+  message?: string;
 };
 
 type RequestParams = {
@@ -47,14 +48,33 @@ async function request(
   } catch (e) {
     const error: Error = e;
 
-    return { isError: true, error };
+    return { isError: true, error, message: error.message };
   }
 }
+
+function expectStatus(result: Result, httpStatus: number) {
+  if (result.isError) {
+    return result;
+  }
+
+  if (result.status !== httpStatus) {
+    result.isError = true;
+    result.message = `Expected HTTP ${httpStatus}, got ${result.status}`;
+
+    return result;
+  }
+
+  return result;
+}
+
+// OPERATIONS
 
 const operations: any = {};
 
 operations.ping = async (): Promise<Result> => {
-  return await request({url: `${URL}/ping`, method: 'GET', omitDefaultHeaders: true});
+  let result = await request({url: `${URL}/ping`, method: 'GET', omitDefaultHeaders: true});
+
+  return expectStatus(result, 200);
 };
 
 export default operations;

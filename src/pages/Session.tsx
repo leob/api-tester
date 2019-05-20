@@ -40,6 +40,7 @@ type State = {
   session: Session | null;
   sessionIndex: number | null;
   showLoading: boolean;
+  forceReload: boolean;
 };
 
 class SessionPage extends Component<Props, State> {
@@ -49,30 +50,37 @@ class SessionPage extends Component<Props, State> {
 
     this.state = {
       showLoading: false,
+      forceReload: false,
       session: null,
       sessionIndex: null
     }
   }
 
   componentDidMount() {
-    this.loadData();
+    this.loadData(false);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
 
     // If the page is called with a different SessionID parameter, then we must (re)load the session data
-    if (this.props.match.params.sessionId !== prevProps.match.params.sessionId) {
-      this.loadData();
+    if ( this.props.match.params.sessionId !== prevProps.match.params.sessionId || this.state.forceReload ) {
+      const forceReload = this.state.forceReload;
+
+      if (forceReload) {
+        this.setState(() => ({ forceReload: false }));
+      }
+
+      this.loadData(forceReload);
     }
   }
 
-  async loadData() {
+  async loadData(forceReload: boolean) {
     const sessionId = this.props.match.params.sessionId;
 
-    await this.loadSession(sessionId);
+    await this.loadSession(sessionId, forceReload);
   }
 
-  async loadSession(sessionId: string) {
+  async loadSession(sessionId: string, forceReload: boolean) {
     const { session, index: sessionIndex } = this.props.findSession(sessionId);
 
     // If the session was not found then set error state (this should normally never happen)
@@ -82,7 +90,7 @@ class SessionPage extends Component<Props, State> {
     }
 
     // If session was already loaded then we're done
-    if (session.isLoaded) {
+    if (session.isLoaded && !forceReload) {
       this.setState(() => ({ session, sessionIndex }));
       return;
     }
@@ -165,6 +173,12 @@ class SessionPage extends Component<Props, State> {
     this.props.history.goBack();
   }
 
+  reload = (e: MouseEvent) => {
+    e.preventDefault();
+
+    this.setState(() => ({ forceReload: true }));
+  }
+
   run = async (e: MouseEvent) => {
     e.preventDefault();
 
@@ -232,19 +246,33 @@ class SessionPage extends Component<Props, State> {
             { scenario &&
                 <IonButton
                   class="ion-margin-end"
-                  color="secondary"
+                  color="primary"
+                  style={{textTransform: 'none'}}
                   onClick={(e: MouseEvent) => this.run(e)}>
 
-                  Run
+                  run
                 </IonButton>
             }
 
             <IonButton
+              class="ion-margin-end"
               color="light"
+              style={{textTransform: 'none'}}
               onClick={(e: MouseEvent) => this.close(e)}>
 
-              Close
+              close
             </IonButton>
+
+            { scenario &&
+                <IonButton
+                  class="ion-margin-start"
+                  color="light"
+                  style={{textTransform: 'none'}}
+                  onClick={(e: MouseEvent) => this.reload(e)}>
+
+                  reload scenario
+                </IonButton>
+            }
           </div>
 
           { scenario &&

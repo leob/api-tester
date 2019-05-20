@@ -22,5 +22,5 @@ export type ScenarioStepResult = {
   isError: boolean;
   data?: any;
   status?: number;
-  error?: string;
+  message?: string;
 };

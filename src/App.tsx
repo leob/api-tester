@@ -1,4 +1,4 @@
-import { hot } from "react-hot-loader";
+// import { hot } from "react-hot-loader";  // React hot reloading commented out for now - TODO fix this
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -47,6 +47,10 @@ class App extends Component {
   }
 }
 
+// React hot reloading commented out, caused too many problems, more trouble than it was worth
+// TODO find out what the problem is with it - might be related to Typescript, which means extra config may be needed
 // React hot reloading - this can be kept in production, no need to deactivate it
-export default hot(module)(App);
+//export default hot(module)(App);
+
+export default App;
 

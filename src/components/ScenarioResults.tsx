@@ -34,7 +34,7 @@ const ScenarioResults: React.SFC<Props> = ({ scenarioName, scenarioSteps, scenar
 
                   <IonText color={ scenarioStepResults[index].isError ? 'danger' : 'success'}>
                     { scenarioStepResults[index].isError
-                      ? "Result: failure, message: " + scenarioStepResults[index].error
+                      ? "Result: failure, message: " + scenarioStepResults[index].message
                       : "Result: success, status code: " + scenarioStepResults[index].status}
                   </IonText>
             )}

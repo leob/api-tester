@@ -114,8 +114,6 @@ class Scenarios extends Component<Props, State> {
       return <></>;
     }
 
-    const buttonStyle = {textTransform: 'none'};
-
     const scenarioError = this.props.scenarioError;
 
     return (
@@ -160,7 +158,7 @@ class Scenarios extends Component<Props, State> {
                       <h3>{scenario.name}</h3>
                       <p>{scenario.description}</p>
                     </IonLabel>
-                    <IonButton size="default" color="secondary" slot="end" style={buttonStyle}
+                    <IonButton size="default" color="secondary" slot="end" style={{textTransform: 'none'}}
                         onClick={(e) => this.selectScenario(e, scenario)}>
 
                       start&nbsp;
