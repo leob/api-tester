@@ -48,6 +48,11 @@ export default (state = defaultState, action: SessionAction): SessionState => {
       ...state,
       sessions: updatedSessions(state, action.payload.session.id, session)
     };
+  case getType(sessions.resetSessions):
+    return {
+      ...state,
+      sessions: state.sessions.map(session => {session.wasExecuted = false; return session;})
+    };
   default:
     return state;
   }

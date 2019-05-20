@@ -1,13 +1,13 @@
 import operations from './operations';
 import { Result } from './operations';
 
-import { ScenarioStep, ScenarioStepResult } from './types';
+import { Scenario, ScenarioStep, ScenarioStepResult } from './types';
 
-export async function executeScenario(steps: ScenarioStep[]): Promise<ScenarioStepResult[]> {
+export async function executeScenario(scenario: Scenario): Promise<ScenarioStepResult[]> {
   let step: ScenarioStep;
   let results: ScenarioStepResult[] = [];
 
-  for (step of steps) {
+  for (step of scenario.steps) {
     let result = await executeScenarioStep(step);
 
     results.push(result);
@@ -17,7 +17,7 @@ export async function executeScenario(steps: ScenarioStep[]): Promise<ScenarioSt
 }
 
 async function executeScenarioStep(scenarioStep: ScenarioStep): Promise<ScenarioStepResult> {
-  const name = scenarioStep.operation;
+  const name = scenarioStep.operation || scenarioStep.name;
   const operation = operations[name];
   let stepResult: ScenarioStepResult;
 

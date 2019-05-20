@@ -24,3 +24,7 @@ export const updateSession = createAction('sessions/UPDATE_SESSION', action =>
 export const addSessionStepResult = createAction('sessions/ADD_SESSION_STEP_RESULT', action =>
   (session: Session, stepResult: ScenarioStepResult) => action({session, stepResult})
 );
+
+export const resetSessions = createAction('sessions/RESET_SESSIONS', action =>
+  () => action()
+);

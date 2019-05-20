@@ -70,7 +70,6 @@ class Sessions extends Component<Props, {}> {
                 >
                   <IonLabel>
                     <h3>{session.scenarioName}</h3>
-                    {/* <p>{scenario.description}</p> */}
                   </IonLabel>
                   <IonNote slot="end">
                     {"(session " + (index+1) + ")"}

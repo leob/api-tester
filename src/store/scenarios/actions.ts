@@ -29,5 +29,5 @@ export const fetchScenarios = createAsyncAction(
 
 // This is an async ("Thunk") action; its actual implementation ("handler") is done in src/store/scenarios/handlers.ts
 export const updateScenarios = createAction('scenarios/UPDATE_SCENARIOS', action =>
-  (/*dummyTestValue: string*/) => action(/*dummyTestValue*/)
+  () => action()
 );

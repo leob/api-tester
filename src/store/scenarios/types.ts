@@ -1,6 +1,6 @@
 export interface Scenario {
   name: string;
-  description: string;
+  description?: string;
 }
 
 export interface ScenarioState {

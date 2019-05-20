@@ -4,20 +4,26 @@ import { RouteComponentProps, withRouter } from 'react-router';
 import { IonIcon, IonMenu, IonHeader, IonToolbar, IonTitle, IonContent,
          IonList, IonListHeader, IonItem, IonLabel, IonMenuToggle } from '@ionic/react';
 
-type Props = RouteComponentProps<{}>;
+import { connect } from 'react-redux';
+import { RootState } from '../store';
 
-const routes = {
-  appPages: [
-    { title: 'Scenarios', path: '/', icon: 'calendar' },
-    { title: 'Sessions', path: '/sessions', icon: 'list-box' },
-    { title: 'About', path: '/about', icon: 'information-circle' }
-  ]
-};
+const mapStateToProps = (state: RootState) => ({
+  sessions: state.sessions.sessions
+});
 
-const Menu: React.SFC<Props> = ({ history }) => {
+type Props = RouteComponentProps<{}> & ReturnType<typeof mapStateToProps>;
 
-  function renderListItems(list: any[]) {
-    return list
+const Menu: React.SFC<Props> = ({ history, sessions }) => {
+
+  function renderListItems(numSessions: number) {
+
+    const routes = [
+      { title: 'Scenarios', path: '/', icon: 'calendar' },
+      { title: 'Sessions (' + numSessions + ')', path: '/sessions', icon: 'list-box' },
+      { title: 'About', path: '/about', icon: 'information-circle' }
+    ];
+
+    return routes
       .filter(route => !!route.path)
       .map((p) => (
         <IonMenuToggle key={p.title} auto-hide="false">
@@ -43,7 +49,7 @@ const Menu: React.SFC<Props> = ({ history }) => {
           <IonListHeader>
             Navigate
           </IonListHeader>
-          { renderListItems(routes.appPages) }
+          { renderListItems(sessions.length) }
         </IonList>
 
         {/* Just to provide some spacing */}
@@ -53,5 +59,7 @@ const Menu: React.SFC<Props> = ({ history }) => {
   );
 };
 
-export default withRouter(Menu);
+export default withRouter(connect(
+  mapStateToProps
+)(Menu));
 

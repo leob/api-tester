@@ -1,11 +1,9 @@
 {
   "name": "Ping",
-  "description": "Ping session",
   "definition": {},
   "steps": [
     {
       "name": "ping",
-      "operation": "ping",
       "description": "the Ping operation"
     }
   ]

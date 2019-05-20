@@ -39,6 +39,7 @@ type Props = RouteComponentProps<BaseProps> & typeof mapDispatchToProps & Return
 type State = {
   session: Session | null;
   sessionIndex: number | null;
+  scenario: Scenario | null;
   showLoading: boolean;
   forceReload: boolean;
 };
@@ -52,7 +53,8 @@ class SessionPage extends Component<Props, State> {
       showLoading: false,
       forceReload: false,
       session: null,
-      sessionIndex: null
+      sessionIndex: null,
+      scenario: null
     }
   }
 
@@ -85,76 +87,81 @@ class SessionPage extends Component<Props, State> {
 
     // If the session was not found then set error state (this should normally never happen)
     if (!session) {
-      this.setState(() => ({ session: null, sessionIndex: null }));
+      this.setState(() => ({ session: null, sessionIndex: null, scenario: null }));
       return;
     }
 
-    // If session was already loaded then we're done
-    if (session.isLoaded && !forceReload) {
-      this.setState(() => ({ session, sessionIndex }));
+    // We *ALWAYS* load the full scenario object (so that we can run it) - and we store this full (complete)
+    // scenario object in the local state; however. in the Redux store we store only a partial version
+    const {scenario, message} = await this.loadScenario(session.scenarioName);
+
+    // If the session was already executed then don't touch it, we need to display the results
+    if (session.wasExecuted && !forceReload) {
+      this.setState(() => ({ session, sessionIndex, scenario }));
       return;
     }
 
-    // Else: scenario not loaded yet (but we know its name)
-    const scenarioName = session.scenarioName;
-
-    try {
-      const response = await fetch('/data/scenarios/' + scenarioName + '.json');
-      const scenarioData: Scenario = await response.json();
-
-      this.populateSession(session, true, false, null, scenarioData);
-
-    } catch (ex) {
-      const e: Error = ex;
-      const message = "Unabled to load the scenario: " + e.message;
-
-      this.populateSession(session, false, true, message, null);
-    }
+    // Session not yet loaded/populated, store scenario data etc in the session
+    this.populateSession(session, message, scenario);
 
     // Update the local state ...
-    this.setState(() => ({ session, sessionIndex }));
+    this.setState(() => ({ session, sessionIndex, scenario }));
     // ... and update the Redux store
     this.props.updateSession(session);
 
     return;
   }
 
-  // 'Populate' the (initially incomplete) Session object so it becomes a complete, "valid" Session
-  populateSession(session: Session, isLoaded: boolean, isError: boolean, error: string, data: Scenario) {
+  async loadScenario(scenarioName: string): Promise<{ scenario: Scenario, message: string }> {
+    let scenario: Scenario = null;
+    let message: string = null;
 
-    session.isLoaded = isLoaded;
-    session.isError = isError;
+    try {
+      const response = await fetch('/data/scenarios/' + scenarioName + '.json');
+      scenario = await response.json();
+
+    } catch (ex) {
+      const e: Error = ex;
+      message = "Unabled to load the scenario: " + e.message;
+    }
+
+    return { scenario, message };
+  }
+
+  // 'Populate' the (initially incomplete) Session object so it becomes a complete, "valid" Session
+  populateSession(session: Session, error: string, scenario: Scenario) {
+
+    session.wasExecuted = false;
+    session.isError = error !== null;
     session.error = error;
 
+    // Copy/clone the *relevant* data from the Scenario into the Session (we don't copy references,
+    // but data - Redux!) - we "unmarshal"/denormalize the JSON data into the flattened Session structure
+    this.copySomeScenarioDataIntoSession(session, scenario);
+  }
+
+  copySomeScenarioDataIntoSession(session: Session, scenario: Scenario) {
+
     session.scenario = null;
-    session.scenarioDefinition = null;
     session.scenarioSteps = null;
 
-    // no data, nothing more to do
-    if (data === null) {
+    // no scenario data, nothing to do
+    if (scenario === null) {
       return;
     }
 
-    // Copy/clone the data from the ScenarioModel into the Session (we don't copy references,
-    // but data - Redux!) - 'unmarshal'/denormalize the JSON data into the flattened Session structure
-
-    // Copy the data
+    // Copy the data (partial - only the properties we need/want in the Redux store)
     session.scenario = {
-      name: data.name,
-      description: data.description
+      name: scenario.name
     };
 
-    // Copy the definition - TODO  empty for now
-    session.scenarioDefinition = {};
-
-    // Copy/clone the steps
-    session.scenarioSteps = data.steps.reduce(
+    // Copy/clone the steps (partial - only the properties we need/want in the Redux store)
+    session.scenarioSteps = scenario.steps.reduce(
       (steps, step) => {
         // copy the data
         steps.push({
           name: step.name,
-          description: step.description,
-          operation: step.operation
+          description: step.description || step.name
         });
 
         return steps;
@@ -163,6 +170,7 @@ class SessionPage extends Component<Props, State> {
 
     // Initialize step results (empty array)
     session.scenarioStepResults = [];
+
   }
 
   close = (e: MouseEvent) => {
@@ -184,9 +192,13 @@ class SessionPage extends Component<Props, State> {
 
     this.setState(() => ({ showLoading: true }));
 
-    const results: ScenarioStepResult[] = await executeScenario(this.state.session.scenarioSteps);
+    const results: ScenarioStepResult[] = await executeScenario(this.state.scenario);
 
     let session = this.state.session;
+
+    // Set wasExecuted to true and update the Redux store
+    session.wasExecuted = true;
+    this.props.updateSession(session);
 
     // Store the results in the Redux store
     for (let result of results) {
@@ -238,10 +250,7 @@ class SessionPage extends Component<Props, State> {
         <IonContent>
           <div className="ion-padding about-info">
             <h4>{(sessionIndex != null ? "Session " + (sessionIndex+1) + ": " : "") + scenarioName}</h4>
-
-            <p>
-              { scenario ? scenario.description : (<IonText color="error">{scenarioError}</IonText>) }
-            </p>
+            { scenarioError && (<p><IonText color="error">{scenarioError}</IonText></p>) }
 
             { scenario &&
                 <IonButton
@@ -263,16 +272,14 @@ class SessionPage extends Component<Props, State> {
               close
             </IonButton>
 
-            { scenario &&
-                <IonButton
-                  class="ion-margin-start"
-                  color="light"
-                  style={{textTransform: 'none'}}
-                  onClick={(e: MouseEvent) => this.reload(e)}>
+            <IonButton
+              class="ion-margin-start"
+              color="light"
+              style={{textTransform: 'none'}}
+              onClick={(e: MouseEvent) => this.reload(e)}>
 
-                  reload scenario
-                </IonButton>
-            }
+              reload scenario
+            </IonButton>
           </div>
 
           { scenario &&
@@ -281,7 +288,7 @@ class SessionPage extends Component<Props, State> {
                 scenarioSteps={session.scenarioSteps}
                 scenarioStepResults={session.scenarioStepResults}
               />
-            }
+          }
         </IonContent>
       </>
     );

@@ -1,5 +1,5 @@
 import { Scenario } from '../scenarios/types';
-import { ScenarioDefinition, ScenarioStep, ScenarioResult, ScenarioStepResult } from '../../lib/types';
+import { ScenarioStep, ScenarioResult, ScenarioStepResult } from '../../lib/types';
 
 //
 // NOTE:
@@ -19,13 +19,12 @@ export interface Session {    // "Flat" structure which contains scenario, scena
   id: string;
   scenarioName: string;
   scenario?: Scenario;
-  scenarioDefinition?: ScenarioDefinition;
   scenarioResult?: ScenarioResult[];
   scenarioSteps?: ScenarioStep[];
   scenarioStepResults?: ScenarioStepResult[];
-  isLoaded: boolean;
   isError: boolean;
   error?: string;
+  wasExecuted: boolean;
 }
 
 export interface SessionState {

@@ -33,8 +33,9 @@ const mapStateToProps = (state: RootState) => ({
 });
 
 const mapDispatchToProps = {
-  updateScenarios: (/*dummyTestValue*/) => actions.scenarios.updateScenarios(/*dummyTestValue*/),
-  addSession: (session) => actions.sessions.addSession(session)
+  updateScenarios: () => actions.scenarios.updateScenarios(),
+  addSession: (session) => actions.sessions.addSession(session),
+  resetSessions: () => actions.sessions.resetSessions()
 };
 
 type Props = RouteComponentProps<{}> & typeof mapDispatchToProps & ReturnType<typeof mapStateToProps>;
@@ -42,7 +43,8 @@ type Props = RouteComponentProps<{}> & typeof mapDispatchToProps & ReturnType<ty
 type State = {
   showAlert: boolean;
   alertHeader?: string;
-  alertMessage?: string
+  alertMessage?: string;
+  forceReload: boolean;
 }
 
 const MAX_SESSIONS = 10;
@@ -52,17 +54,20 @@ class Scenarios extends Component<Props, State> {
   defaultState: State = {
     showAlert: false,
     alertHeader: '',
-    alertMessage: undefined
+    alertMessage: undefined,
+    forceReload: false
   }
 
   constructor(props: Props) {
     super(props);
 
-    props.updateScenarios(/*"a dummy test value, not used"*/);
-
     this.state = {
       ...this.defaultState
     };
+  }
+
+  componentDidMount() {
+    this.props.updateScenarios();
   }
 
   dismissAlert = () => {
@@ -99,15 +104,24 @@ class Scenarios extends Component<Props, State> {
       const session: Session = {
         id: sessionId,
         scenarioName: scenario.name,
-        isLoaded: false,
-        isError: false
+        isError: false,
+        wasExecuted: false
       }
       // add session to the store, the SessionPage will then load it from the store using the sessionId URL parameter
       this.props.addSession(session);
 
       this.props.history.push(`/sessions/${sessionId}`);
     }
-  };
+  }
+
+  reloadAll = (e: MouseEvent) => {
+    e.preventDefault();
+
+    this.props.updateScenarios();
+    this.props.resetSessions();
+
+    this.showAlert("Scenarios reloaded", "The scenarios and the sessions have been reloaded");
+  }
 
   render() {
     if (!this.props.scenarios && !this.props.scenarioError) {
@@ -141,6 +155,16 @@ class Scenarios extends Component<Props, State> {
           <IonList>
             <IonListHeader color="light">
               <IonLabel>Available test scenarios</IonLabel>
+              <IonButton
+                class="ion-margin-end"
+                color="light"
+                size="small"
+                style={{textTransform: 'none'}}
+                onClick={(e: MouseEvent) => this.reloadAll(e)}
+              >
+
+                  reload all
+              </IonButton>
             </IonListHeader>
             {scenarioError ? (
                 <IonItem>
@@ -156,7 +180,7 @@ class Scenarios extends Component<Props, State> {
                   >
                     <IonLabel>
                       <h3>{scenario.name}</h3>
-                      <p>{scenario.description}</p>
+                      <p>{scenario.description || scenario.name}</p>
                     </IonLabel>
                     <IonButton size="default" color="secondary" slot="end" style={{textTransform: 'none'}}
                         onClick={(e) => this.selectScenario(e, scenario)}>

@@ -1,17 +1,16 @@
 export type Scenario = {
   name: string;
-  description: string;
-  definition: ScenarioDefinition;
+  configuration: ScenarioConfiguration;
   steps: ScenarioStep[];
 };
 
 export interface ScenarioStep {
   name: string;
   description?: string;
-  operation: string;
+  operation?: string;
 }
 
-export interface ScenarioDefinition {
+export interface ScenarioConfiguration {
 }
 
 export type ScenarioResult = {
