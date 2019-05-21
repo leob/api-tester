@@ -4,22 +4,35 @@ export type Scenario = {
   steps: ScenarioStep[];
 };
 
-export interface ScenarioStep {
+export type SuccessResultField = {
+  name: string, assignToVar?: string
+};
+
+export type SuccessResult = {
+  status?: number;
+  fields: [ SuccessResultField ];
+};
+
+export type ScenarioStep = {
   name: string;
   description?: string;
   operation?: string;
-}
+  data?: any;
+  successResult?: SuccessResult;
+};
 
-export interface ScenarioConfiguration {
-}
+export type ScenarioConfiguration = {
+  url?: string;
+};
 
 export type ScenarioResult = {
-}
+};
 
 export type ScenarioStepResult = {
   stepName: string;
   isError: boolean;
-  data?: any;
+  input?: any,
+  output?: any;
   status?: number;
   message?: string;
 };

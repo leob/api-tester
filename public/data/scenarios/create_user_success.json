@@ -1,9 +1,47 @@
 {
   "name": "create_user_success",
-  "definition": {},
+  "configuration": {
+    "apiUrl": "",
+    "stopOnError": true,
+    "vars": {
+      "seqNum": {"func": "getSeqNum"},
+      "token": "",
+      "user_id": ""
+    }
+  },
   "steps": [
     {
-      "name": "createUser"
+      "name": "createUser",
+      "data": {
+        "full_name": "Tester${seqNum}",
+        "password_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "email": "user${seqNum}@test.com",
+        "phone_number": {
+          "country": "NL",
+          "number": "${seqNum}"
+        }
+      },
+      "successResult": {
+        "status": "200",
+        "fields": [
+          {"name": "token", "assignToVar": "token"},
+          {"name": "user_id", "assignToVar": "user_id"}
+       ]
+      }
+    },
+    {
+      "name": "getUser",
+      "data": {
+        "user_id": "${user_id}",
+        "token": "${token}"
+      },
+      "successResult": {
+        "status": "200",
+        "fields": [
+          {"name": "user_id"},
+          {"name": "full_name"}
+       ]
+      }
     }
   ]
 }

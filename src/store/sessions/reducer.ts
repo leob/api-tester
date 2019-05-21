@@ -8,8 +8,12 @@ const defaultState: SessionState = {
 
 export type SessionAction = ActionType<typeof sessions>;
 
+function findSession(state: SessionState, sessionId: string): number {
+  return state.sessions.findIndex(session => session.id === sessionId);
+}
+
 function updatedSessions(state: SessionState, sessionId: string, session: Session): Session[] {
-  const index = state.sessions.findIndex(session => session.id === sessionId);
+  const index = findSession(state, sessionId);
 
   // Recompose "sessions" by inserting the updated session at the right position (index),
   // meaning that we're completely replacing the session (remove and insert)
@@ -38,8 +42,9 @@ export default (state = defaultState, action: SessionAction): SessionState => {
       sessions: updatedSessions(state, action.payload.id, action.payload)
     };
   case getType(sessions.addSessionStepResult):
-    // Make a "shallow" copy
-    let session: Session = { ...action.payload.session };
+    // Make a "shallow" copy of the session
+    const index = findSession(state, action.payload.session.id);
+    let session: Session = { ...state.sessions[index] };
 
     // Replace step results (immutably)
     session.scenarioStepResults = [ ...session.scenarioStepResults, action.payload.stepResult ];

@@ -212,7 +212,7 @@ class SessionPage extends Component<Props, State> {
     // Wait a few seconds before closing the loader/spinner, in case "executeScenario" takes only a fraction of a second;
     // we diable the loading indicator, and we udpate the session
     setTimeout(() => {
-      this.setState(() => ({ showLoading: false, session: updatedSession, sessionIndex }));
+      this.setState(() => ({ session: updatedSession, sessionIndex, showLoading: false }));
     }, 1500);
   }
 

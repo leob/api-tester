@@ -1,10 +1,15 @@
 {
   "name": "Ping",
-  "definition": {},
+  "configuration": {},
   "steps": [
     {
       "name": "ping",
       "description": "the Ping operation"
+    },
+    {
+      "name": "pong",
+      "operation": "ping",
+      "description": "the Pong operation"
     }
   ]
 }
