@@ -22,7 +22,7 @@
         }
       },
       "successResult": {
-        "status": "200",
+        "status": 200,
         "fields": [
           {"name": "token", "assignToVar": "token"},
           {"name": "user_id", "assignToVar": "user_id"}
@@ -36,7 +36,7 @@
         "token": "${token}"
       },
       "successResult": {
-        "status": "200",
+        "status": 200,
         "fields": [
           {"name": "user_id"},
           {"name": "full_name"}

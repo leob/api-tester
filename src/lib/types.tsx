@@ -22,7 +22,9 @@ export type ScenarioStep = {
 };
 
 export type ScenarioConfiguration = {
-  url?: string;
+  apiUrl?: string;
+  stopOnError?: boolean;
+  vars?: any;
 };
 
 export type ScenarioResult = {

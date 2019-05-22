@@ -93,7 +93,7 @@ function expectFields(result: Result, step: ScenarioStep) {
 }
 
 function getUrl(scenario: Scenario, url: string) {
-  return scenario.configuration.url + '/' + url;
+  return scenario.configuration.apiUrl + '/' + url;
 }
 
 // OPERATIONS
@@ -107,6 +107,7 @@ operations.ping = async (scenario: Scenario, step: ScenarioStep): Promise<Result
 };
 
 operations.createUser = async (scenario: Scenario, step: ScenarioStep): Promise<Result> => {
+
   let result = await request({url: getUrl(scenario, `user`), method: 'POST', data: step.data});
 
   result = expectStatus(result, step);

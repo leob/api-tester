@@ -58,6 +58,14 @@ class ScenarioResults extends Component<Props, State> {
   render() {
     const { scenarioName, scenarioSteps, scenarioStepResults } = this.props;
 
+    function resultOutputToString(output: any): string {
+      if (typeof output === 'string') {
+        return output;
+      }
+
+      return JSON.stringify(output);
+    }
+
     return (
       <IonList>
         <IonListHeader color="light">
@@ -74,16 +82,20 @@ class ScenarioResults extends Component<Props, State> {
                     <h3>{step.name}</h3>
                     <p>{step.description}</p>
                     {scenarioStepResults[index] && (
-                      <IonText color={scenarioStepResults[index].isError ? 'danger' : 'success'}>
+                      <IonText
+color={scenarioStepResults[index].isError ? 'danger' : scenarioStepResults[index].status ? 'success' : 'warning'}>
                         {scenarioStepResults[index].isError
                           ? "Result: failure, message: " + scenarioStepResults[index].message
-                          : "Result: success, status code: " + scenarioStepResults[index].status}
+                          : scenarioStepResults[index].status
+                            ? "Result: success, status code: " + scenarioStepResults[index].status
+                            : "Result: cancelled"
+                        }
                       </IonText>
                     )}
                   </IonLabel>
                 </IonCol>
                 <IonCol>
-                {scenarioStepResults[index] && (
+                {scenarioStepResults[index] && scenarioStepResults[index].status && (
                   <IonButton class="ion-float-right" size="default" color="secondary" style={{textTransform: 'none'}}
                       onClick={(e) => this.toggleShowDetails(e, index)}>
 
@@ -97,7 +109,7 @@ class ScenarioResults extends Component<Props, State> {
                 </IonCol>
               </IonRow>
 
-              {scenarioStepResults[index] && this.state.showDetails[index] && (
+              {this.state.showDetails[index] && (
                 <IonRow>
                   <IonCol>
                     <IonCard>
@@ -108,7 +120,7 @@ class ScenarioResults extends Component<Props, State> {
                       </IonCardHeader>
                       <IonCardContent>
                         <code>
-                          {scenarioStepResults[index].output}
+                          {resultOutputToString(scenarioStepResults[index].output)}
                         </code>
                       </IonCardContent>
                     </IonCard>

@@ -9,8 +9,8 @@ const funcs: any = {};
 funcs.getSeqNum = () => {
   const ms = (new Date()).getTime();
 
-  // take the first 11 digits (instead of the full 13 digits), which is already "unique enough"
-  return ("" + ms).substring(0, 11);
+  // take the first 9 digits (instead of the full 13 digits), which is already "unique enough"
+  return ("" + ms).substring(0, 9);
 };
 
 export default funcs;
