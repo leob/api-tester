@@ -5,7 +5,7 @@ import { Result } from './operations';
 
 import util from './util';
 
-import { Scenario, ScenarioStep, ScenarioStepResult } from './types';
+import { Scenario, ScenarioStep, ScenarioStepResult, SuccessResultField } from './types';
 
 const URL = config.API_URL;
 
@@ -27,8 +27,15 @@ export async function executeScenario(scenario: Scenario): Promise<ScenarioStepR
     } else {
       result = await executeScenarioStep(scenario, step);
 
-      if (result.isError && scenario.configuration.stopOnError) {
-        cancelledRun = true;
+      result = expectStatus(result, step);
+      result = expectFields(result, step);
+
+      if (result.isError) {
+        if (scenario.configuration.stopOnError) {
+          cancelledRun = true;
+        }
+      } else {
+        scenario = handleStepResult(scenario, step, result);
       }
     }
 
@@ -36,6 +43,62 @@ export async function executeScenario(scenario: Scenario): Promise<ScenarioStepR
   }
 
   return results;
+}
+
+function expectStatus(result: ScenarioStepResult, step: ScenarioStep) {
+  if (result.isError) {
+    return result;
+  }
+
+  const httpStatus = step && step.successResult && step.successResult.status ? step.successResult.status : 200;
+
+  if (result.status !== httpStatus) {
+    result.isError = true;
+    result.message = `Expected HTTP ${httpStatus}, got ${result.status}`;
+
+    return result;
+  }
+
+  return result;
+}
+
+function expectFields(result: ScenarioStepResult, step: ScenarioStep) {
+  if (result.isError || !step.successResult || !step.successResult.fields) {
+    return result;
+  }
+
+  const fields: SuccessResultField[] = step.successResult.fields;
+  let field: SuccessResultField;
+
+  for (field of fields) {
+    if (!result.output || !result.output[field.name]) {
+      result.isError = true;
+      result.message = `Expected field ${field} in result.data`;
+
+      return result;
+    }
+  }
+
+  return result;
+}
+
+function handleStepResult(scenario: Scenario, step: ScenarioStep, result: ScenarioStepResult): Scenario {
+
+  if (!step.successResult || ! step.successResult.fields || !scenario.configuration || !scenario.configuration.vars) {
+    return scenario;
+  }
+
+  const fields: SuccessResultField[] = step.successResult.fields;
+  let field: SuccessResultField;
+
+  for (field of fields) {
+    // Store a value from the step's output in a scenario variable, so that another step can pick it up
+    if (field.assignToVar && result.output && result.output[field.name]) {
+      scenario.configuration.vars[field.assignToVar] = result.output[field.name];
+    }
+  }
+
+  return scenario;
 }
 
 function initScenario(scenario: Scenario): Scenario {
@@ -87,9 +150,6 @@ function initVar(v: any): any {
     }
   }
 
-  // TODO other cases
-// console.log('INITVAR V = ', v);
-
   return v;
 }
 
@@ -117,8 +177,8 @@ function replaceDataVariable(v: string, vars: any): any {
 
   while (v.match(/\$\{.*\}/)) {
 
-    // we ue a counter for safety (to guard against an inifite loop)
-    if (counter++ > 10) {   // something must be wrong
+    // We use a counter for safety (to guard against an inifite loop)
+    if (counter++ > 10) {   // Something must be wrong ...
       break;
     }
 

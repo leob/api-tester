@@ -1,4 +1,4 @@
-import { Scenario, ScenarioStep, SuccessResultField } from './types';
+import { Scenario, ScenarioStep } from './types';
 
 import axios from 'axios';
 import { AxiosRequestConfig } from 'axios';
@@ -15,20 +15,11 @@ type RequestParams = {
   url: string;
   method: string;
   headers?: {} | null;
-  omitDefaultHeaders?: boolean;
   params?: {} | null;
   data?: {} | null;
 };
 
-async function request(
-  {url, method, headers = null, omitDefaultHeaders = false, params = null, data = null}: RequestParams): Promise<Result> {
-
-  const defaultHeaders = {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  };
-
-  headers = omitDefaultHeaders ? headers : {...defaultHeaders, ...(headers || {})}
+async function request({ url, method, headers = null, params = null, data = null }: RequestParams): Promise<Result> {
 
   try {
     const config: AxiosRequestConfig = {
@@ -55,43 +46,6 @@ async function request(
   }
 }
 
-function expectStatus(result: Result, step: ScenarioStep) {
-  if (result.isError) {
-    return result;
-  }
-
-  const httpStatus = step && step.successResult && step.successResult.status ? step.successResult.status : 200;
-
-  if (result.status !== httpStatus) {
-    result.isError = true;
-    result.message = `Expected HTTP ${httpStatus}, got ${result.status}`;
-
-    return result;
-  }
-
-  return result;
-}
-
-function expectFields(result: Result, step: ScenarioStep) {
-  if (result.isError || !step.successResult || !step.successResult.fields) {
-    return result;
-  }
-
-  const fields: SuccessResultField[] = step.successResult.fields;
-  let field: SuccessResultField;
-
-  for (field of fields) {
-    if (!result.data || !result.data[field.name]) {
-      result.isError = true;
-      result.message = `Expected field ${field} in result.data`;
-
-      return result;
-    }
-  }
-
-  return result;
-}
-
 function getUrl(scenario: Scenario, url: string) {
   return scenario.configuration.apiUrl + '/' + url;
 }
@@ -101,19 +55,20 @@ function getUrl(scenario: Scenario, url: string) {
 const operations: any = {};
 
 operations.ping = async (scenario: Scenario, step: ScenarioStep): Promise<Result> => {
-  let result = await request({url: getUrl(scenario, `ping`), method: 'GET', omitDefaultHeaders: true});
-
-  return expectStatus(result, step);
+  return await request({url: getUrl(scenario, `ping`), method: 'GET'});
 };
 
 operations.createUser = async (scenario: Scenario, step: ScenarioStep): Promise<Result> => {
+  return await request({url: getUrl(scenario, `user`), method: 'POST', data: step.data});
+};
 
-  let result = await request({url: getUrl(scenario, `user`), method: 'POST', data: step.data});
 
-  result = expectStatus(result, step);
-  result = expectFields(result, step);
+operations.getUser = async (scenario: Scenario, step: ScenarioStep): Promise<Result> => {
 
-  return result;
+  const url = getUrl(scenario, `user`) + '/' + step.data.user_id;
+  const headers = {'X-UMPYRE-APIKEY': step.data.token};
+
+  return await request({url, method: 'GET', headers});
 };
 
 export default operations;

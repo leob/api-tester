@@ -39,6 +39,16 @@ class ScenarioResults extends Component<Props, State> {
     }
   }
 
+  componentDidUpdate(prevProps) {
+
+    // If we got (new) step results, then also reset "showDetails"
+    if ( this.props.scenarioStepResults.length !== 0 && prevProps.scenarioStepResults.length === 0 ) {
+
+      // reset "showDetails"
+      this.setState({ showDetails: this.props.scenarioSteps.map((e) => false) });
+    }
+  }
+
   toggleShowDetails = (e: MouseEvent, index: number) => {
     if (!e.currentTarget) {
       return;
@@ -54,11 +64,10 @@ class ScenarioResults extends Component<Props, State> {
     this.setState({ showDetails: updatedShowDetails });
   }
 
-  //: React.SFC<Props> = ({ scenarioName, scenarioSteps, scenarioStepResults }) => {
   render() {
     const { scenarioName, scenarioSteps, scenarioStepResults } = this.props;
 
-    function resultOutputToString(output: any): string {
+    function objectToString(output: any): string {
       if (typeof output === 'string') {
         return output;
       }
@@ -88,7 +97,7 @@ color={scenarioStepResults[index].isError ? 'danger' : scenarioStepResults[index
                           ? "Result: failure, message: " + scenarioStepResults[index].message
                           : scenarioStepResults[index].status
                             ? "Result: success, status code: " + scenarioStepResults[index].status
-                            : "Result: cancelled"
+                            : "Result: skipped"
                         }
                       </IonText>
                     )}
@@ -109,18 +118,32 @@ color={scenarioStepResults[index].isError ? 'danger' : scenarioStepResults[index
                 </IonCol>
               </IonRow>
 
-              {this.state.showDetails[index] && (
+              {scenarioStepResults[index] && this.state.showDetails[index] && (
                 <IonRow>
-                  <IonCol>
+                  <IonCol size="6">
+                    <IonCard>
+                      <IonCardHeader>
+                        <IonCardSubtitle>
+                          Input
+                        </IonCardSubtitle>
+                      </IonCardHeader>
+                      <IonCardContent>
+                        <code>
+                          {objectToString(scenarioStepResults[index].input)}
+                        </code>
+                      </IonCardContent>
+                    </IonCard>
+                  </IonCol>
+                  <IonCol size="6">
                     <IonCard>
                       <IonCardHeader>
                         <IonCardSubtitle>
                           Output
                         </IonCardSubtitle>
                       </IonCardHeader>
-                      <IonCardContent>
+                      <IonCardContent class="ion-text-wrap">
                         <code>
-                          {resultOutputToString(scenarioStepResults[index].output)}
+                          {objectToString(scenarioStepResults[index].output)}
                         </code>
                       </IonCardContent>
                     </IonCard>
