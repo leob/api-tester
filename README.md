@@ -69,7 +69,7 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
 The tool can be improved and extended in many ways, some features that come to mind:
 
-* Add a 'branching' fearure: depending on the result of a step (for instance, success or failure) allow selecting the next step to execute
+* Add a 'branching' feature: depending on the result of a step (for instance, success or failure), allow configuring the next step to execute
 * Make the tool usable as a "CLI" tool (from the command line, instead of only via the GUI)
 * Add the ability to enter the values for scenario variables via form fields in the GUI
 * Add some 'statistics' to the tool (e.g. record the begin/end time or duration of each step and of the full scenario)
