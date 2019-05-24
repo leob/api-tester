@@ -120,7 +120,7 @@ color={scenarioStepResults[index].isError ? 'danger' : scenarioStepResults[index
 
               {scenarioStepResults[index] && this.state.showDetails[index] && (
                 <IonRow>
-                  <IonCol size="6">
+                  <IonCol>
                     <IonCard>
                       <IonCardHeader>
                         <IonCardSubtitle>
@@ -134,14 +134,14 @@ color={scenarioStepResults[index].isError ? 'danger' : scenarioStepResults[index
                       </IonCardContent>
                     </IonCard>
                   </IonCol>
-                  <IonCol size="6">
+                  <IonCol>
                     <IonCard>
                       <IonCardHeader>
                         <IonCardSubtitle>
                           Output
                         </IonCardSubtitle>
                       </IonCardHeader>
-                      <IonCardContent class="ion-text-wrap">
+                      <IonCardContent>
                         <code>
                           {objectToString(scenarioStepResults[index].output)}
                         </code>
