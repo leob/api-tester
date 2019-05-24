@@ -4,5 +4,7 @@
     "description": "Ping operation"
   }, {
     "name": "create_user_success"
+  }, {
+    "name": "login_or_create_user"
   }
 ]

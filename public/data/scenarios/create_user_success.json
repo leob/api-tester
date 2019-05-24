@@ -21,7 +21,7 @@
           "number": "${seqNum}"
         }
       },
-      "successResult": {
+      "expectResult": {
         "status": 200,
         "fields": [
           {"name": "token", "assignToVar": "token"},
@@ -35,7 +35,7 @@
         "user_id": "${user_id}",
         "token": "${token}"
       },
-      "successResult": {
+      "expectResult": {
         "status": 200,
         "fields": [
           {"name": "user_id"},

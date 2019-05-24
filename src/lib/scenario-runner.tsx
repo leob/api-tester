@@ -5,9 +5,10 @@ import { Result } from './operations';
 
 import util from './util';
 
-import { Scenario, ScenarioStep, ScenarioStepResult, SuccessResultField } from './types';
+import { Scenario, ScenarioStep, ScenarioStepResult, ExpectResultField } from './types';
 
-const URL = config.API_URL;
+const API_URL = config.API_URL;
+const API_KEY = config.API_KEY;
 
 export async function executeScenario(scenario: Scenario): Promise<ScenarioStepResult[]> {
   let step: ScenarioStep;
@@ -27,8 +28,7 @@ export async function executeScenario(scenario: Scenario): Promise<ScenarioStepR
     } else {
       result = await executeScenarioStep(scenario, step);
 
-      result = expectStatus(result, step);
-      result = expectFields(result, step);
+      result = expectResult(result, step);
 
       if (result.isError) {
         if (scenario.configuration.stopOnError) {
@@ -45,12 +45,21 @@ export async function executeScenario(scenario: Scenario): Promise<ScenarioStepR
   return results;
 }
 
-function expectStatus(result: ScenarioStepResult, step: ScenarioStep) {
+function expectResult(result: ScenarioStepResult, step: ScenarioStep) {
+
+  // If the step failed then we don't check the rest
   if (result.isError) {
     return result;
   }
 
-  const httpStatus = step && step.successResult && step.successResult.status ? step.successResult.status : 200;
+  result = expectStatus(result, step);
+  result = expectFields(result, step);
+
+  return result;
+}
+
+function expectStatus(result: ScenarioStepResult, step: ScenarioStep) {
+  const httpStatus = step && step.expectResult && step.expectResult.status ? step.expectResult.status : 200;
 
   if (result.status !== httpStatus) {
     result.isError = true;
@@ -63,12 +72,12 @@ function expectStatus(result: ScenarioStepResult, step: ScenarioStep) {
 }
 
 function expectFields(result: ScenarioStepResult, step: ScenarioStep) {
-  if (result.isError || !step.successResult || !step.successResult.fields) {
+  if (!step.expectResult || !step.expectResult.fields) {
     return result;
   }
 
-  const fields: SuccessResultField[] = step.successResult.fields;
-  let field: SuccessResultField;
+  const fields: ExpectResultField[] = step.expectResult.fields;
+  let field: ExpectResultField;
 
   for (field of fields) {
     if (!result.output || !result.output[field.name]) {
@@ -84,12 +93,12 @@ function expectFields(result: ScenarioStepResult, step: ScenarioStep) {
 
 function handleStepResult(scenario: Scenario, step: ScenarioStep, result: ScenarioStepResult): Scenario {
 
-  if (!step.successResult || ! step.successResult.fields || !scenario.configuration || !scenario.configuration.vars) {
+  if (!step.expectResult || ! step.expectResult.fields || !scenario.configuration || !scenario.configuration.vars) {
     return scenario;
   }
 
-  const fields: SuccessResultField[] = step.successResult.fields;
-  let field: SuccessResultField;
+  const fields: ExpectResultField[] = step.expectResult.fields;
+  let field: ExpectResultField;
 
   for (field of fields) {
     // Store a value from the step's output in a scenario variable, so that another step can pick it up
@@ -106,8 +115,9 @@ function initScenario(scenario: Scenario): Scenario {
   scenario.configuration = config;
 
   if (!config.apiUrl) {
-    config.apiUrl = URL;
+    config.apiUrl = API_URL;
   }
+  config.apiKey = API_KEY;
 
   scenario = initVars(scenario);
 

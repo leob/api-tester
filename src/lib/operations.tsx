@@ -50,6 +50,17 @@ function getUrl(scenario: Scenario, url: string) {
   return scenario.configuration.apiUrl + '/' + url;
 }
 
+function getApiKey(scenario: Scenario) {
+  return scenario.configuration.apiKey;
+}
+
+function getApiKeyHeaders(scenario: Scenario, step: ScenarioStep) {
+  const apiKey = getApiKey(scenario);
+  const headers = {}; headers[apiKey] = step.data.token;
+
+  return headers;
+}
+
 // OPERATIONS
 
 const operations: any = {};
@@ -62,13 +73,10 @@ operations.createUser = async (scenario: Scenario, step: ScenarioStep): Promise<
   return await request({url: getUrl(scenario, `user`), method: 'POST', data: step.data});
 };
 
-
 operations.getUser = async (scenario: Scenario, step: ScenarioStep): Promise<Result> => {
-
   const url = getUrl(scenario, `user`) + '/' + step.data.user_id;
-  const headers = {'X-UMPYRE-APIKEY': step.data.token};
 
-  return await request({url, method: 'GET', headers});
+  return await request({url, method: 'GET', headers: getApiKeyHeaders(scenario, step)});
 };
 
 export default operations;

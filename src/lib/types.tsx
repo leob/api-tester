@@ -4,13 +4,13 @@ export type Scenario = {
   steps: ScenarioStep[];
 };
 
-export type SuccessResultField = {
+export type ExpectResultField = {
   name: string, assignToVar?: string
 };
 
-export type SuccessResult = {
+export type ExpectResult = {
   status?: number;
-  fields: [ SuccessResultField ];
+  fields?: [ ExpectResultField ];
 };
 
 export type ScenarioStep = {
@@ -18,11 +18,12 @@ export type ScenarioStep = {
   description?: string;
   operation?: string;
   data?: any;
-  successResult?: SuccessResult;
+  expectResult?: ExpectResult;
 };
 
 export type ScenarioConfiguration = {
   apiUrl?: string;
+  apiKey?: string;
   stopOnError?: boolean;
   vars?: any;
 };
